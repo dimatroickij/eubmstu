@@ -25,7 +25,7 @@ def registration(request):
 
 
 def home(request):
-    # if not request.user.is_authenticated:
-    return render(request, 'registration/home.html', {})
-    # else:
-    #     return JsonResponse('registration')
+    if request.user.is_authenticated:
+        return render(request, 'registration/home.html', {})
+    else:
+        return redirect('login')

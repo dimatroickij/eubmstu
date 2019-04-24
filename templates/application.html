@@ -15,6 +15,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
     <script src="{% static 'js/applications.js' %}"></script>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1"/>
     <title>{% block title %}{% endblock %}</title>
@@ -24,18 +26,19 @@
     <nav class="navbar navbar-expand-lg bg-nav">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">
-                    <img class="logo" src="{% static 'images/eulogo.png' %}"/>
+                <a class="navbar-brand" href="/">
+                    <span class="text-nowrap hidden-xs hidden-sm hidden-md">
+                        <img class="logo" src="{% static 'images/eulogo.png' %}"/>
                     ЭУ
+                    </span>
+
                 </a>
+
 
                 <button class="navbar-toggler" type="button" data-toggle="collapse"
                         data-target="#navbarSupportedContent"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
             </div>
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
@@ -47,6 +50,20 @@
                         <a class="nav-link" href="#">Link</a>
                     </li>
                 </ul>
+                {% if request.user.is_authenticated %}
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="nav-item dropdown navbar-right">
+                            <a class="nav-link dropdown-toggle sign" href="#" id="navbarDropdownMenuLink" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ request.user.username }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="#">Личные данные</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'logout' %}">Выход</a>
+                            </div>
+                    </ul>
+                {% endif %}
             </div>
         </div>
 

@@ -2,7 +2,7 @@
 {% block title %}Вход в систему{% endblock %}
 {% block content %}
     {% load recaptcha2 %}
-    {% recaptcha_init 'es' %}
+    {% recaptcha_init 'ru' %}
     <div class="container">
         <div class="row">
             <div class="col-md-4">
@@ -27,15 +27,14 @@
                         <label><a href="{% url 'password_reset' %}">Забыли пароль?</a></label>
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block">Войти
+                        <button type="submit" class="btn btn-primary btn-block">Авторизация
                         </button>
                     </div>
                     <div class="form-group">
-                        Нет аккаунта?<br/>
-                        <a class="btn btn-primary" href="{% url 'authentication:registration' %}">Регистрация</a>
+                        <a class="btn btn-primary btn-block " href="{% url 'authentication:registration' %}">Регистрация</a>
                     </div>
                 </form>
-                {% recaptcha_explicit_init 'es' %}
+                {% recaptcha_explicit_init 'ru' %}
 
             </div>
             <div class="col-md-8">
