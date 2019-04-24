@@ -1,0 +1,12 @@
+django
+django-extensions
+django-debug-toolbar
+gunicorn
+psycopg2-binary
+psycopg2
+psycopg2-binary
+requests
+django-celery-results
+django-celery-beat
+celery
+django-recaptcha2
