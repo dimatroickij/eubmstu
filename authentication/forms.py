@@ -24,18 +24,24 @@ class LoginForm(AuthenticationForm):
         model = User
         fields = ('username', 'password')
 
+
 class MyUserCreationForm(UserCreationForm):
-    email = forms.EmailField(max_length=254, help_text='Введите email',
+    email = forms.EmailField(max_length=254, help_text='Обязательное поле',
                              widget=forms.EmailInput(attrs={'class': 'form-control'}))
+
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
-        self.fields['username'].widget = widget=forms.TextInput(attrs={'class': 'form-control'})
-        self.fields['password1'].widget = widget=forms.PasswordInput(attrs={'class': 'form-control'})
-        self.fields['password2'].widget = widget = forms.PasswordInput(attrs={'class': 'form-control'})
+        self.fields['username'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['password1'].widget = forms.PasswordInput(attrs={'class': 'form-control'})
+        self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control'})
+        self.fields['first_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['last_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['patronymic'].widget = forms.TextInput(attrs={'class': 'form-control'})
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2',)
+        fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'password1', 'password2')
+
 
 class MyPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
@@ -45,6 +51,7 @@ class MyPasswordResetForm(PasswordResetForm):
     class Meta:
         model = User
         fields = ('email')
+
 
 class MyPasswordChangeForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
@@ -56,6 +63,7 @@ class MyPasswordChangeForm(PasswordChangeForm):
     class Meta:
         model = User
         fields = ('old_password', 'new_password1', 'new_password2')
+
 
 class MySetPasswordForm(SetPasswordForm):
     # new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))

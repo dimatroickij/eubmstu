@@ -15,7 +15,7 @@ def registration(request):
                 user = form.save()
                 user.is_active = False
                 user.save()
-                messages.add_message(request, messages.SUCCESS, 'Подтвердите email для завершения регистрации')
+                messages.add_message(request, messages.SUCCESS, 'Вы зарегистрированы. Ждите подтверждения.')
                 return JsonResponse('122', safe=False)
         else:
             form = MyUserCreationForm()
