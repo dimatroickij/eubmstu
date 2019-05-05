@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'snowpenguin.django.recaptcha2',
+    # 'django-celery-results',
+    # 'django-celery-beat',
     'authentication',
     'control'
 ]
@@ -132,3 +134,17 @@ STATICFILES_DIRS = [
 
 config.get('eubmstu', 'RECAPTCHA_PRIVATE_KEY')
 config.get('eubmstu', 'RECAPTCHA_PUBLIC_KEY')
+
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'dimatroickij1997@yandex.ru'
+EMAIL_HOST_PASSWORD = 'hbkpwspjabrtszeu'
+EMAIL_USE_SSL = True
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+CELERY_BROKER_URL = 'amqp://dimatroickij:Troickij1@localhost:5672/eubmstu'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TIMEZONE = 'Europe/Moscow'
