@@ -21,11 +21,11 @@ def registration(request):
             form = MyUserCreationForm()
         return render(request, 'registration/signup.html', {'form': form})
     else:
-        return render(request, 'registration/signup.html', )
+        return redirect('profile')
 
-
-def home(request):
+def profile(request):
     if request.user.is_authenticated:
-        return render(request, 'registration/home.html', {})
+
+        return render(request, 'registration/profile.html', {})
     else:
         return redirect('login')

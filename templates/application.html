@@ -19,6 +19,7 @@
           rel="stylesheet">
     <script src="{% static 'js/applications.js' %}"></script>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1"/>
+    <link rel="shortcut icon" type="image/ico" href="{% static "favicon.ico" %}">
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -43,19 +44,27 @@
             </div>
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Управление модулем</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 {% if request.user.is_authenticated %}
                     <ul class="nav navbar-nav navbar-right">
                         <li class="nav-item dropdown navbar-right">
                             <a class="nav-link dropdown-toggle sign" href="#" id="navbarDropdownMenuLink" role="button"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{ request.user.username }}
+                                {{ request.user.first_name }} {{ request.user.last_name }}
+                                ({{ request.user.patronymic }})
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <a class="dropdown-item" href="#">Личные данные</a>
@@ -65,10 +74,20 @@
                     </ul>
                 {% endif %}
             </div>
+
         </div>
 
     </nav>
 </div>
 {% block content %}{% endblock %}
+<div class="container">
+    <hr>
+    <p>
+        Разработано в качестве дипломного проекта<br/>
+        МГТУ им. Н. Э. Баумана<br/>
+        Информатика и системы управления<br/>
+        Компьютерные системы и сети
+    </p>
+</div>
 </body>
 </html>

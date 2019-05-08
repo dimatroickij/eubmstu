@@ -1,0 +1,146 @@
+{% extends 'application.html' %}
+{% block title %} Личные данные {% endblock %}
+{% block content %}
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+
+        function editData(btn) {
+            var tdUsername = $('#username');
+            var tdLastName = $('#last_name');
+            var tdName = $('#first_name');
+            var tdPatronymic = $('#patronymic');
+            var tdEmail = $('#email');
+            var tdWork = $('#work');
+
+            if ($(btn).text() === 'edit') {
+                $(btn).text('save');
+                $(btn).prop('title', 'Сохранить');
+                $(btn).tooltip('dispose');
+                $(btn).tooltip();
+
+                var username = tdUsername.text();
+                tdUsername.text('');
+                $('<input>',
+                    {
+                        type: 'text',
+                        value: username,
+                        class: 'form-control'
+                    }).appendTo(tdUsername);
+
+                var lastName = tdLastName.text();
+                tdLastName.text('');
+                $('<input>',
+                    {
+                        type: 'text',
+                        value: lastName,
+                        class: 'form-control'
+                    }).appendTo(tdLastName);
+
+                var name = tdName.text();
+                tdName.text('');
+                $('<input>',
+                    {
+                        type: 'text',
+                        value: name,
+                        class: 'form-control'
+                    }).appendTo(tdName);
+
+                var patronymic = tdPatronymic.text();
+                tdPatronymic.text('');
+                $('<input>',
+                    {
+                        type: 'text',
+                        value: patronymic,
+                        class: 'form-control'
+                    }).appendTo(tdPatronymic);
+
+                var email = tdEmail.text();
+                tdEmail.text('');
+                $('<input>',
+                    {
+                        type: 'email',
+                        value: email,
+                        class: 'form-control'
+                    }).appendTo(tdEmail);
+
+                var work = tdWork.text();
+                tdWork.text('');
+                $('<input>',
+                    {
+                        type: 'text',
+                        value: work,
+                        class: 'form-control'
+                    }).appendTo(tdWork);
+            } else {
+                $(btn).text('edit');
+                $(btn).prop('title', 'Изменить');
+                $(btn).tooltip('dispose');
+                $(btn).tooltip();
+                tdUsername.text('');
+                tdLastName.text('');
+                tdName.text('');
+                tdPatronymic.text('');
+                tdEmail.text('');
+                tdWork.text('');
+            }
+        }
+    </script>
+    <div class="container">
+        <div class="row">
+
+            <div class="col col-md-6">
+                <div class="page-header">
+                    <h1>Личные данные
+                        <i class="material-icons editData" data-toggle="tooltip" title="Изменить"
+                           onclick="editData(this)">edit</i>
+                    </h1>
+                </div>
+                <table class="table table-striped table-hover">
+                    <tbody>
+                    <tr>
+                        <th scope="row">Логин</th>
+                        <td id="username">{{ request.user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Фамилия</th>
+                        <td id="last_name">{{ request.user.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Имя</th>
+                        <td id="first_name">{{ request.user.first_name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Отчество</th>
+                        <td id="patronymic">{{ request.user.patronymic }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td id="email">{{ request.user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Являетесь администратором</th>
+                        <td id="superuser">
+                            {% if request.user.is_superuser %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Место работы</th>
+                        <td id="work">{{ request.user.is_superuser }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2"><label>Для смены пароля перейдите по <a
+                                href="{% url 'password_change' %}">ссылке</a></label></th>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

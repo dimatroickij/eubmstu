@@ -31,17 +31,17 @@
                         </button>
                     </div>
                     <div class="form-group">
-                        <a class="btn btn-primary btn-block " href="{% url 'authentication:registration' %}">Регистрация</a>
+                        <a class="btn btn-primary btn-block "
+                           href="{% url 'authentication:registration' %}">Регистрация</a>
                     </div>
                 </form>
                 {% recaptcha_explicit_init 'ru' %}
 
             </div>
             <div class="col-md-8">
-                <h3>Главная страница</h3>
+                {% include "mainBlock.html" %}
             </div>
         </div>
-
     </div>
 
 {% endblock %}

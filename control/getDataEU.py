@@ -1,3 +1,4 @@
+import os
 import platform
 from telnetlib import EC
 
@@ -6,18 +7,19 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
+from eubmstu.settings import BASE_DIR
+
 
 class getDataEU:
-
     # Инициализация класса
     def __init__(self, username, password, teacher, vpn):
         self.options = webdriver.ChromeOptions()
         if platform.system() == 'Linux':
             display = Display(visible=0, size=(1920, 1080))
             display.start()
-            self.driver = webdriver.Chrome('/home/dimatroickij/eubmstu/chromedriver', 0, self.options)
+            self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver'), 0, self.options)
         elif platform.system() == 'Windows':
-            self.driver = webdriver.Chrome('C:/chromedriver.exe', 0, self.options)
+            self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver.exe'), 0, self.options)
         self.username = username
         self.password = password
         self.teacher = teacher

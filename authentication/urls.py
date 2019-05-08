@@ -5,5 +5,5 @@ from authentication import views
 app_name = 'authentication'
 urlpatterns = [
     path('accounts/registration/', views.registration, name='registration'),
-    path('', views.home, name='home'),
+    path('', views.profile, name='profile'),
 ]

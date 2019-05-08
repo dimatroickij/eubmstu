@@ -92,14 +92,18 @@
     background-color: #2c3e50;
 }
 
-div h3, div .h3 {
+div h1, div .h1 {
+    font-size: 39px;
+}
+
+div h3, div .h3, div h1, div .h1 {
     margin-top: 21px;
     margin-bottom: 10.5px;
 }
 
-div h3, div .h3 {
+div h3, div .h3, div h1, div .h1{
     font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 400;
+    /*font-weight: 400;*/
     line-height: 1.1;
     color: inherit;
 }
@@ -125,4 +129,28 @@ body {
     color: #ffffff;
     background-color: #1a242f;
     border-color: #161f29;
+}
+
+.page-header {
+    text-align: left;
+    padding-bottom: 9.5px;
+    margin: 42px 0 21px;
+    border-bottom: 1px solid transparent;
+}
+
+label > a:hover, label > a:focus {
+    color: #18bc9c;
+    background-color: transparent;
+    text-decoration: none
+}
+
+.editData {
+    color: #007bff;
+    text-decoration: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.editData:hover {
+    color: #0056b3;
 }

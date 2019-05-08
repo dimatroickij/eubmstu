@@ -5,8 +5,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 # Create your views here.
+from eubmstu.settings import BASE_DIR
+
 
 @login_required
 def test(request):
-    print(os.path.dirname(__file__))
-    return JsonResponse('123', safe=False)
+    print(os.environ)
+    return JsonResponse(1, safe=False)
