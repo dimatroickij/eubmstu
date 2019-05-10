@@ -3,10 +3,17 @@
 {% load i18n %}
 {% block contentSite %}
     <!-- Container -->
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+            {% if title %} &rsaquo; {{ title }}{% endif %}
+        </div>
+    {% endblock %}
+
     <div class="container">
         {% block messages %}
             {% if messages %}
-                <div class="card">
+                <div class="card mt-4">
                     <ul class="messagelist list-group list-group-flush">
                         {% for message in messages %}
                             <li{% if message.tags %}

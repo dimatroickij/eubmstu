@@ -169,7 +169,7 @@ i {
     vertical-align: middle;
 }
 
-.card-header, .thead-dark {
+.card-header, .thead-dark, .breadcrumbs {
     background-color: #2c3e50;
     color: white;
 }
@@ -201,4 +201,41 @@ ul.errorlist {
 
 li{
      list-style-type: none;
+}
+
+table thead th.sorted .sortoptions {
+    display: block;
+    padding: 9px 5px 0 5px;
+    float: right;
+    text-align: right;
+}
+
+table thead th.sorted .sortoptions a.sortremove {
+    background-position: 0 0;
+}
+
+table thead th.sorted .sortoptions a {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    background: url(/static/admin/img/sorting-icons.svg) 0 0 no-repeat;
+    background-size: 14px auto;
+}
+
+thead th.sorted a.sortremove {
+    visibility: hidden;
+}
+
+table thead th.sorted .sortoptions a.sortremove {
+    background-position: 0 0;
+}
+
+table thead th.sorted .sortoptions a {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    background: url(/static/admin/img/sorting-icons.svg) 0 0 no-repeat;
+    background-size: 14px auto;
 }
