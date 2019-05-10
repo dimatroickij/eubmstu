@@ -1,6 +1,6 @@
 {% extends 'application.html' %}
 {% block title %} Регистрация на сайте {% endblock %}
-{% block content %}
+{% block contentSite %}
     <div class="container">
         {% if not request.user.is_authenticated %}
             <h3 class="text-center">Регистрация</h3>

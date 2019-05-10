@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
 from authentication.forms import LoginForm, MyPasswordResetForm, MyPasswordChangeForm
+from eubmstu import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +33,5 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls'), ),
     path('', include('authentication.urls'), ),
     path('', include('control.urls'), ),
+    path('favicon.ico', views.favicon),
 ]

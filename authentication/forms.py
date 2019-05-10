@@ -42,7 +42,6 @@ class MyUserCreationForm(UserCreationForm):
         model = User
         fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'password1', 'password2')
 
-
 class MyPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
         super(PasswordResetForm, self).__init__(*args, **kwargs)

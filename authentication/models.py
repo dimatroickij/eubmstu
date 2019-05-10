@@ -10,8 +10,9 @@ class User(AbstractUser):
     AbstractUser._meta.get_field('first_name').help_text = 'Обязательное поле'
     AbstractUser._meta.get_field('last_name').blank = False
     AbstractUser._meta.get_field('last_name').help_text = 'Обязательное поле'
+    AbstractUser._meta.get_field('email').blank = False
 
     class Meta(object):
         unique_together = ('email',)
-        verbose_name = 'пользователя'
+        verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'

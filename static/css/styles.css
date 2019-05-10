@@ -11,7 +11,7 @@
     color: #ffffff;
 }
 
-.bg-nav .navbar-nav > li > a {
+.bg-nav .navbar-nav > li > a, .card-header > a {
     color: #ffffff;
 }
 
@@ -43,9 +43,19 @@
     border-radius: 1px;
 }
 
-.bg-nav .navbar-nav > li > a:hover {
+.bg-nav .navbar-nav > li > a:hover, .card-header > a:hover {
     color: #18bc9c;
     background-color: transparent;
+}
+
+a:hover {
+    text-decoration: none;
+    background-color: transparent;
+    color: #388E3C;
+}
+
+a {
+    color: #18bc9c;
 }
 
 .navbar-nav > li > .dropdown-menu {
@@ -101,7 +111,7 @@ div h3, div .h3, div h1, div .h1 {
     margin-bottom: 10.5px;
 }
 
-div h3, div .h3, div h1, div .h1{
+div h3, div .h3, div h1, div .h1 {
     font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
     /*font-weight: 400;*/
     line-height: 1.1;
@@ -153,4 +163,13 @@ label > a:hover, label > a:focus {
 
 .editData:hover {
     color: #0056b3;
+}
+
+i {
+    vertical-align:middle;
+}
+
+.card-header{
+    background-color: #2c3e50;
+    color:white;
 }
