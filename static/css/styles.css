@@ -166,10 +166,24 @@ label > a:hover, label > a:focus {
 }
 
 i {
-    vertical-align:middle;
+    vertical-align: middle;
 }
 
-.card-header{
+.card-header, .thead-dark {
     background-color: #2c3e50;
-    color:white;
+    color: white;
+}
+
+.thead-dark a {
+    color: white;
+}
+.list-group-item {
+    background-color: transparent;
+    border-color: transparent
+}
+
+.list-group-item.active {
+    border-color: transparent;
+    background-color: transparent;
+    font-weight: bold;
 }

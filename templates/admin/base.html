@@ -1,4 +1,6 @@
 {% extends 'application.html' %}
+
+{% load i18n %}
 {% block contentSite %}
     <!-- Container -->
     <div class="container">
@@ -12,29 +14,33 @@
         {% endblock messages %}
 
         <!-- Content -->
+
         <div id="content">
             <h3>
                 {% block pretitle %}{% endblock %}
                 {% block content_title %}{% if title %}<h3>{{ title }}</h3>{% endif %}{% endblock %}
             </h3>
             <div class="row">
-
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-9">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-9 col-xl-9">
                     {% block content %}
                         {% block object-tools %}{% endblock %}
                         {{ content }}
                     {% endblock %}
                 </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-3">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
                     {% block sidebar %}{% endblock %}
                 </div>
-                <br class="clear">
             </div>
+            <br class="clear">
+
         </div>
+
         <!-- END Content -->
 
         {% block footer %}
-            <div id="footer"></div>{% endblock %}
+            <div id="footer"></div>
+        {% endblock %}
+
 
     </div>
 {% endblock %}
