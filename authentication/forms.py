@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, PasswordChangeForm, \
-    SetPasswordForm
+    SetPasswordForm, ReadOnlyPasswordHashField, UserChangeForm
 from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
 
@@ -41,6 +41,28 @@ class MyUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'password1', 'password2')
+
+class MyUserChangeForm(UserChangeForm):
+    """A form for updating users. Includes all the fields on
+    the user, but replaces the password field with admin's
+    password hash display field.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['email'].widget = forms.TextInput(attrs={'class': 'form-control', 'type': 'email'})
+        self.fields['first_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['last_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['patronymic'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        # self.fields['last_login'].widget = forms.DateTimeInput(attrs={'readonly': True, 'class': 'form-control',
+        #                                                                'type': 'datetime'})
+        # self.fields['date_joined'].widget = forms.DateTimeInput(attrs={'readonly': True, 'class': 'form-control',
+        #                                                                                 'type': 'datetime'})
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'last_name', 'first_name', 'patronymic', 'email')
 
 class MyPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):

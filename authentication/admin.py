@@ -4,19 +4,19 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
-from authentication.forms import MyUserCreationForm
+from authentication.forms import MyUserCreationForm, UserChangeForm, MyUserChangeForm
 from authentication.models import User
 
 
 class MyUserAdmin(UserAdmin):
-    form = MyUserCreationForm
+    form = MyUserChangeForm
     add_form = MyUserCreationForm
     list_display = ('username', 'last_name', 'first_name', 'patronymic', 'is_active', 'is_superuser')
     fieldsets = (
         (None, {'fields': ('username', 'email')}),
         ('Персональная информация', {'fields': ('last_name', 'first_name', 'patronymic')}),
         ('Права доступа', {'fields': ('is_active', 'is_superuser')}),
-        ('Важные даты', {'fields': ('date_joined', 'last_login')}),
+        # ('Важные даты', {'fields': ('date_joined', 'last_login')}),
     )
     add_fieldsets = (
         (None, {'fields': ('username', 'email')}),

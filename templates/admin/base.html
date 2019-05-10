@@ -4,12 +4,16 @@
 {% block contentSite %}
     <!-- Container -->
     <div class="container">
-
         {% block messages %}
             {% if messages %}
-                <ul class="messagelist">{% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-                {% endfor %}</ul>
+                <div class="card">
+                    <ul class="messagelist list-group list-group-flush">
+                        {% for message in messages %}
+                            <li{% if message.tags %}
+                                class="list-group-item text-{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
         {% endblock messages %}
 

@@ -177,13 +177,28 @@ i {
 .thead-dark a {
     color: white;
 }
-.list-group-item {
+#changelist-filter .list-group-item {
     background-color: transparent;
     border-color: transparent
 }
 
-.list-group-item.active {
+#changelist-filter .list-group-item.active {
     border-color: transparent;
     background-color: transparent;
     font-weight: bold;
+}
+
+.errors input, .errors select, .errors textarea {
+    border: 1px solid #ba2121;
+}
+
+ul.errorlist {
+    margin: 0 0 4px;
+    padding: 0;
+    color: #ba2121;
+    background: #fff;
+}
+
+li{
+     list-style-type: none;
 }

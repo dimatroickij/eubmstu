@@ -14,5 +14,5 @@ class User(AbstractUser):
 
     class Meta(object):
         unique_together = ('email',)
-        verbose_name = 'Пользователь'
+        verbose_name = 'пользователь'
         verbose_name_plural = 'Пользователи'
