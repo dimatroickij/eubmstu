@@ -55,7 +55,7 @@
                     {% endif %}
                     {% if user.is_superuser %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin">Управление модулем</a>
+                            <a class="nav-link" href="/admin">Администрирование сайта</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -68,7 +68,7 @@
                                 ({{ request.user.patronymic }})
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="#">Личные данные</a>
+                                <a class="dropdown-item" href="/">Личные данные</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{% url 'logout' %}">Выход</a>
                             </div>

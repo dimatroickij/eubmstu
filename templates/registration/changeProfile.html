@@ -1,0 +1,28 @@
+{% extends 'application.html' %}
+{% block title %} Изменение данных {% endblock %}
+{% block contentSite %}
+    <div class="container">
+            <h3 class="text-center">Изменение данных</h3>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group row">
+                        <label for="{{ field.id_for_label }}"
+                               class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-form-label">{{ field.label }}</label>
+                        <div class="col col-sm col-md col-lg col-xl">
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            <label>Для смены пароля перейдите по <a href="/accounts/password_change/">ссылке</a></label><br/>
+                <button type="submit" class="btn btn-primary">Изменить</button>
+            </form>
+
+    </div>
+{% endblock %}

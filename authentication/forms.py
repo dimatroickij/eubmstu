@@ -62,7 +62,7 @@ class MyUserChangeForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'last_name', 'first_name', 'patronymic', 'email')
+        fields = ('username', 'last_name', 'first_name', 'patronymic', 'email')
 
 class MyPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
