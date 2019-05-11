@@ -36,14 +36,15 @@ class Student(models.Model):
 
 
 class Semester(models.Model):
-    name_current = models.CharField('Название (Текущая успеваемость)', max_length=40, unique=True)
-    code_current = models.CharField('Код (Текущая успеваемость)', max_length=7, blank=True, unique=True)
-    name_session = models.CharField('Название (Результаты сессии)', max_length=40, unique=True)
-    code_session = models.CharField('Код (Результаты сессии)', max_length=15, blank=True, unique=True)
+    name = models.CharField('Название', max_length=40, unique=True)
+    code = models.CharField('Код', max_length=20, blank=True, unique=True)
+    session = models.BooleanField('Сессия', default=True)
 
     class Meta:
         verbose_name = 'семестр'
         verbose_name_plural = 'Семестры'
+        ordering = ['name']
+
 
 class Group(models.Model):
     name = models.CharField('Название группы', max_length=10, unique=True)
@@ -77,6 +78,7 @@ class Subject(models.Model):
         verbose_name = 'предмет'
         verbose_name_plural = 'Предметы'
 
+
 class Progress(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
@@ -86,6 +88,7 @@ class Progress(models.Model):
         unique_together = [['subject', 'student']]
         verbose_name = 'Текущая успеваемость'
         verbose_name_plural = 'Текущая успеваемость'
+
 
 class Session(models.Model):
     RATING = (('Зчт', 'Зачтено'),

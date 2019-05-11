@@ -32,7 +32,9 @@ class GroupAdmin(admin.ModelAdmin):
 
 @admin.register(Semester)
 class SemesterAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name', 'code', 'session']
+    list_display = ('name', 'code', 'session')
+    list_filter = ['session']
 
 
 @admin.register(Progress)

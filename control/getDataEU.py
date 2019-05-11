@@ -39,27 +39,66 @@ class getDataEU:
             self.driver.find_element(By.NAME, 'username').send_keys(self.username)
             self.driver.find_element(By.NAME, 'password').send_keys(self.password)
             self.driver.find_element(By.NAME, 'Login').click()
-            element = WebDriverWait(self.driver, 30).until(
-                EC.title_is("BMSTU Remote Access"))
+            # element = WebDriverWait(self.driver, 30).until(
+            #     EC.title_is("BMSTU Remote Access"))
             self.driver.execute_script(
                 "parent.doURL('75676763663A2F2F72682E6F7A6667682E6568',[{ 'l' : '4829322D03D1606FB09AE9AF59A271D3', 'n' : 1}],'get',false,'no', false)")
         else:
             self.driver.get("http://eu.bmstu.ru")
         if self.teacher:
+            self.driver.get(
+                self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/a[2]").get_attribute(
+                    'href'))
             self.driver.find_element(By.NAME, 'login').send_keys(self.username)
             self.driver.find_element(By.NAME, 'password').send_keys(self.password)
             self.driver.find_element(By.NAME, 'send').click()
         else:
-            element = WebDriverWait(self.driver, 30).until(
-                EC.title_is('НОЦ "ЭУ" Авторизация'))
+            # element = WebDriverWait(self.driver, 30).until(
+            #     EC.title_is('НОЦ "ЭУ" Авторизация'))
             self.driver.get(
-                self.driver.find_element(By.XPATH, "//div[@class='auth-ais-container']//dl//dt/a").get_attribute(
+                self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/a[1]").get_attribute(
                     'href'))
             self.driver.find_element(By.NAME, 'username').send_keys(self.username)
             self.driver.find_element(By.NAME, 'password').send_keys(self.password)
             self.driver.find_element(By.NAME, 'submit').click()
-        WebDriverWait(self.driver, 30).until(EC.visibility_of_element_located((By.ID, 'workarea')))
+        # WebDriverWait(self.driver, 30).until(EC.visibility_of_element_located((By.ID, 'workarea')))
         self.isLogin = True
         # except Exception as e:
         #     print(str(e))
         # self.driver.quit()
+
+    def getSemester(self):
+        listTerm = []
+        self.driver.get(self.linkProgress)
+        for term in self.driver.find_elements(By.XPATH, "//ul[@display='none']/li/a"):
+            listTerm.append({'name': term.get_attribute('text'), 'link': term.get_attribute('href').split('/')[-2],
+                             'session': False})
+        code = listTerm[-1]['link']
+        if code[-1] == '1':
+            code = code[0:-1] + '2'
+        else:
+            code = str(int(code[0:4]) + 1) + '-01'
+        listTerm.append(
+            {'name': self.driver.find_element(By.XPATH, "//span[@class='false-link']").text, 'link': code,
+             'session': False})
+        self.driver.get(self.linkSession)
+        self.linkSession = self.driver.current_url
+        for term in self.driver.find_elements(By.XPATH, "//ul[@id='term-select']/li/a"):
+            link = term.get_attribute('href').split('/')[-1]
+            listTerm.append(
+                {'name': term.get_attribute('text'), 'link': link, 'session': True})
+        code = listTerm[-1]['link']
+        code = code[0:12] + str(int(code[12:]) + 1)
+        listTerm.append(
+            {'name': self.driver.find_element(By.XPATH, "//span[@class='false-link']").text, 'link': code,
+             'session': True})
+        return listTerm
+
+    def exit(self):
+        try:
+            self.driver.quit()
+            self.driver = None
+        except:
+            self.driver.quit()
+            self.driver = None
+        return True

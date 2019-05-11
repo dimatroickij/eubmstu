@@ -11,10 +11,21 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import platform
+from configparser import RawConfigParser
+config = RawConfigParser()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+if platform.system() == 'Linux':
+    config.read('/'.join(BASE_DIR.split('/')[0:-1]) + '/settings.ini')
+elif platform.system() == 'Windows':
+    config.read('\\'.join(BASE_DIR.split('\\')[0:-1]) + '\\settings.ini')
+
+USERNAME = config.get('login', 'username')
+PASSWORD = config.get('login', 'password')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -39,7 +50,8 @@ INSTALLED_APPS = [
     # 'django-celery-results',
     # 'django-celery-beat',
     'authentication',
-    'control'
+    'control',
+    'update'
 ]
 
 MIDDLEWARE = [
