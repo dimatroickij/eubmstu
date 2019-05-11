@@ -94,6 +94,20 @@ class getDataEU:
              'session': True})
         return listTerm
 
+    def getDep(self):
+        listDep = []
+        self.driver.get(self.linkProgress)
+        for i, dep in enumerate(self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/span")):
+            if ['ИСОТ', 'ФО', 'ВИ'].count(dep.text.split('-')[0].replace(' ', '')) == 0:
+                listDep.append(
+                    {'name': '-'.join(dep.text.split('-')[1:]), 'code': dep.text.split('-')[0].replace(' ', ''), 'number': i + 1})
+
+        # elif j == 1:
+        #     self.driver.get(self.linkSession + link)
+        #     for i, dep in enumerate(self.driver.find_elements(By.XPATH, "//ul[@id ='session-structure']/li/span/span")):
+        #         listDep.append({'name': dep.text.split('—')[0].replace(' ', ''), 'i': i + 1})
+        return listDep
+
     def exit(self):
         try:
             self.driver.quit()

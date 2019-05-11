@@ -5,9 +5,10 @@ from django.db import models
 class Departament(models.Model):
     code = models.CharField('Код факультета', max_length=5, unique=True)
     name = models.CharField('Название факультета', max_length=200, unique=True)
+    number = models.IntegerField(null=True, unique=True)
 
     class Meta:
-        ordering = ['code']
+        ordering = ['number']
         verbose_name = 'факультет'
         verbose_name_plural = 'Факультеты'
 
@@ -39,6 +40,9 @@ class Semester(models.Model):
     name = models.CharField('Название', max_length=40, unique=True)
     code = models.CharField('Код', max_length=20, blank=True, unique=True)
     session = models.BooleanField('Сессия', default=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = 'семестр'

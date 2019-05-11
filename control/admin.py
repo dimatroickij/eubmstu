@@ -1,13 +1,16 @@
+from django import forms
 from django.contrib import admin
 
 # Register your models here.
+from django.forms import BaseModelForm
 
 from control.models import Departament, Student, Subject, Subdepartament, Group, Semester, Progress, Session
 
 
 @admin.register(Departament)
 class DepartamentAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name', 'code']
+    list_display = ('code', 'name')
 
 
 @admin.register(Student)
@@ -29,9 +32,19 @@ class SubdepartamentAdmin(admin.ModelAdmin):
 class GroupAdmin(admin.ModelAdmin):
     pass
 
+# class SemesterForm(BaseModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super(BaseModelForm, self).__init__(*args, **kwargs)
+#         username = forms.TextInput(attrs={'class': 'form-control'})
+#
+#     class Meta:
+#         model = Semester
+#         fields = ('name', 'code')
 
 @admin.register(Semester)
 class SemesterAdmin(admin.ModelAdmin):
+    # add_form = SemesterForm
+    # form = SemesterForm
     search_fields = ['name', 'code', 'session']
     list_display = ('name', 'code', 'session')
     list_filter = ['session']
