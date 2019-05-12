@@ -75,7 +75,7 @@ def updateGroup(all):
                 subDeps = Subdepartament.objects.all()
                 for subDep in subDeps:
                     try:
-                        print(subDep.code)
+                        # print(subDep.code)
                         groups = eu.getGroups(subDep.departament.code, subDep.code, semester.code)
                         # print(groups)
                         for group in groups:
