@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static admin_list %}
+{% load i18n admin_urls static admin_list_new %}
 
 {% block extrastyle %}
     {{ block.super }}
@@ -49,7 +49,7 @@
             {% endblock %}
             {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
 
-            <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %}
+            <form class="" id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %}
                   enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
                 {% if cl.formset %}
                     <div>{{ cl.formset.management_form }}</div>
@@ -70,9 +70,21 @@
 {% block sidebar %}
     {% block filters %}
         {% if cl.has_filters %}
+            <script>
+            function iconFilter(btn) {
+                if ($(btn).attr('aria-expanded') === 'true')
+                    $('#iconFilter').text('keyboard_arrow_down');
+                else
+                    $('#iconFilter').text('keyboard_arrow_up');
+            }
+            </script>
             <div id="changelist-filter" class="card bg-light">
-            <div class="card-header">{% trans 'Filter' %}</div>
-            <div class="card-body">
+            <div class="card-header d-flex justify-content-between align-items-center" data-toggle="collapse"
+                 href="#collapseFilter" onclick="iconFilter(this)">
+                {% trans 'Filter' %}
+                <span class="badge badge-pill"><i class="material-icons" id="iconFilter">keyboard_arrow_down</i></span>
+            </div>
+            <div class="card-body collapse" id="collapseFilter">
                 {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
             </div>
         {% endif %}

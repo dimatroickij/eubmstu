@@ -98,15 +98,22 @@ class getDataEU:
         listDep = []
         self.driver.get(self.linkProgress)
         for i, dep in enumerate(self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/span")):
-            if ['ИСОТ', 'ФО', 'ВИ'].count(dep.text.split('-')[0].replace(' ', '')) == 0:
+            if ['ИСОТ', 'ФО', 'ВИ'].count(dep.text.split(' - ')[0]) == 0:
                 listDep.append(
-                    {'name': '-'.join(dep.text.split('-')[1:]), 'code': dep.text.split('-')[0].replace(' ', ''), 'number': i + 1})
-
-        # elif j == 1:
-        #     self.driver.get(self.linkSession + link)
-        #     for i, dep in enumerate(self.driver.find_elements(By.XPATH, "//ul[@id ='session-structure']/li/span/span")):
-        #         listDep.append({'name': dep.text.split('—')[0].replace(' ', ''), 'i': i + 1})
+                    {'name': dep.text.split(' - ')[1:], 'code': dep.text.split(' - ')[0],
+                     'number': i + 1})
         return listDep
+
+    def getSubDep(self, dep):
+        if self.driver.current_url != self.linkProgress:
+            self.driver.get(self.linkProgress)
+        listSubDep = []
+        subDeps = self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li[%s]/ul/li/span" % str(dep))
+        for i, subDep in enumerate(subDeps):
+            text = subDep.get_attribute("innerHTML")
+            listSubDep.append({'name': text.split(' - ')[1], 'code': text.split(' - ')[0],
+                               'number': i + 1})
+        return listSubDep
 
     def exit(self):
         try:

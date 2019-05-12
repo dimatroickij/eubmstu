@@ -18,13 +18,18 @@ class Departament(models.Model):
 
 class Subdepartament(models.Model):
     code = models.CharField('Код кафедры', max_length=10, unique=True)
-    name = models.CharField('Название кафедры', max_length=200, unique=True)
+    name = models.CharField('Название кафедры', max_length=200)
     departament = models.ForeignKey(Departament, on_delete=models.CASCADE, verbose_name='Факультет')
+    number = models.IntegerField('Порядковый номер на сайте', null=True)
+
+    def __str__(self):
+        return self.code
 
     class Meta:
         ordering = ['code']
-        verbose_name = 'кафедру'
+        verbose_name = 'кафедра'
         verbose_name_plural = 'Кафедры'
+        unique_together = [['code', 'name']]
 
 
 class Student(models.Model):

@@ -1,5 +1,12 @@
 {% load i18n %}
-<div class="actions">
+<script>
+    $(document).ready(
+        function () {
+            $('span[class=all], span[class=question], span[class=clear], a[class=showall]').attr('style', 'display:none;')
+        }
+    )
+</script>
+<div class="actions form-inline">
     {% block actions %}
         {% block actions-form %}
             {% for field in action_form %}
@@ -13,7 +20,7 @@
             {% endfor %}
         {% endblock %}
         {% block actions-submit %}
-            <button type="submit" class="button btn btn-primary" title="{% trans "Run the selected action" %}"
+            <button type="submit" class="button btn btn-primary ml-2 mr-2" title="{% trans "Run the selected action" %}"
                     name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
         {% endblock %}
         {% block actions-counter %}

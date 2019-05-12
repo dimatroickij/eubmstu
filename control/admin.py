@@ -11,6 +11,7 @@ from control.models import Departament, Student, Subject, Subdepartament, Group,
 class DepartamentAdmin(admin.ModelAdmin):
     search_fields = ['name', 'code']
     list_display = ('code', 'name')
+    list_per_page = 10
 
 
 @admin.register(Student)
@@ -25,7 +26,10 @@ class SubjectAdmin(admin.ModelAdmin):
 
 @admin.register(Subdepartament)
 class SubdepartamentAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name', 'code']
+    list_display = ('code', 'name', 'departament')
+    list_filter = ['departament']
+    list_per_page = 10
 
 
 @admin.register(Group)
@@ -48,6 +52,7 @@ class SemesterAdmin(admin.ModelAdmin):
     search_fields = ['name', 'code', 'session']
     list_display = ('name', 'code', 'session')
     list_filter = ['session']
+    list_per_page = 10
 
 
 @admin.register(Progress)
