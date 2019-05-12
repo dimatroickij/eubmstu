@@ -1,6 +1,5 @@
 {% extends 'application.html' %}
-
-{% load i18n %}
+{% load i18n  static %}
 {% block contentSite %}
     <!-- Container -->
     {% block breadcrumbs %}
@@ -11,6 +10,13 @@
     {% endblock %}
 
     <div class="container">
+        <script>
+            $(document).ready(function () {
+                    $('input:text').addClass('form-control');
+                    $("input[type='number']").addClass('form-control')
+                }
+            )
+        </script>
         {% block messages %}
             {% if messages %}
                 <div class="card mt-4">

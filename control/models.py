@@ -5,7 +5,10 @@ from django.db import models
 class Departament(models.Model):
     code = models.CharField('Код факультета', max_length=5, unique=True)
     name = models.CharField('Название факультета', max_length=200, unique=True)
-    number = models.IntegerField(null=True, unique=True)
+    number = models.IntegerField('Порядковый номер на сайте', null=True, unique=True)
+
+    def __str__(self):
+        return self.code
 
     class Meta:
         ordering = ['number']
