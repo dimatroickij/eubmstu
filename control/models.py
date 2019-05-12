@@ -5,13 +5,12 @@ from django.db import models
 class Departament(models.Model):
     code = models.CharField('Код факультета', max_length=5, unique=True)
     name = models.CharField('Название факультета', max_length=200, unique=True)
-    number = models.IntegerField('Порядковый номер на сайте', null=True, unique=True)
 
     def __str__(self):
         return self.code
 
     class Meta:
-        ordering = ['number']
+        ordering = ['code']
         verbose_name = 'факультет'
         verbose_name_plural = 'Факультеты'
 
@@ -20,7 +19,6 @@ class Subdepartament(models.Model):
     code = models.CharField('Код кафедры', max_length=10, unique=True)
     name = models.CharField('Название кафедры', max_length=200)
     departament = models.ForeignKey(Departament, on_delete=models.CASCADE, verbose_name='Факультет')
-    number = models.IntegerField('Порядковый номер на сайте', null=True)
 
     def __str__(self):
         return self.code
@@ -55,20 +53,26 @@ class Semester(models.Model):
     class Meta:
         verbose_name = 'семестр'
         verbose_name_plural = 'Семестры'
-        ordering = ['name']
+        ordering = ['code']
 
 
 class Group(models.Model):
-    name = models.CharField('Название группы', max_length=10, unique=True)
-    code_link = models.CharField('Код группы для сайта', max_length=50, unique=True)
+    LEVEL_EDUCATION = (('bachelor', 'Бакалавриат'),
+                       ('magister', 'Магистратура'),
+                       ('specialist', 'Специалитет / Аспирантура'))
+    name = models.CharField('Название группы', max_length=10)
+    code = models.CharField('Код группы для сайта', max_length=50, unique=True)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр')
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
+    levelEducation= models.CharField('Уровень образования', max_length=10, choices=LEVEL_EDUCATION, null=True)
+    isEmpty = models.BooleanField('Есть данные', default=False)
     students = models.ManyToManyField(Student, verbose_name='Студенты')
 
     class Meta:
         ordering = ['name']
-        verbose_name = 'группу'
+        verbose_name = 'группа'
         verbose_name_plural = 'Группы'
+        unique_together = [['name', 'code']]
 
 
 # class StudentsGroup(models.Model):

@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
+from eubmstu.exceptions import EmptyListSubDeps, EmptyListDeps, EmptyListGroups, DepsNotFound, SubDepsNotFound
 from eubmstu.settings import BASE_DIR
 
 
@@ -67,7 +68,7 @@ class getDataEU:
         #     print(str(e))
         # self.driver.quit()
 
-    def getSemester(self):
+    def getSemesters(self):
         listTerm = []
         self.driver.get(self.linkProgress)
         for term in self.driver.find_elements(By.XPATH, "//ul[@display='none']/li/a"):
@@ -94,26 +95,80 @@ class getDataEU:
              'session': True})
         return listTerm
 
-    def getDep(self):
+    def getDepartaments(self):
         listDep = []
         self.driver.get(self.linkProgress)
-        for i, dep in enumerate(self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/span")):
-            if ['ИСОТ', 'ФО', 'ВИ'].count(dep.text.split(' - ')[0]) == 0:
-                listDep.append(
-                    {'name': dep.text.split(' - ')[1:], 'code': dep.text.split(' - ')[0],
-                     'number': i + 1})
-        return listDep
+        deps = self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/span")
+        if len(deps) == 0:
+            raise EmptyListDeps()
+        else:
+            for dep in deps:
+                if ['ИСОТ', 'ФО', 'ВИ'].count(dep.text.split(' - ')[0]) == 0:
+                    listDep.append(
+                        {'name': dep.text.split(' - ')[1:], 'code': dep.text.split(' - ')[0]})
+            return listDep
 
-    def getSubDep(self, dep):
+    def getSubDepartaments(self, dep):
         if self.driver.current_url != self.linkProgress:
             self.driver.get(self.linkProgress)
         listSubDep = []
-        subDeps = self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li[%s]/ul/li/span" % str(dep))
-        for i, subDep in enumerate(subDeps):
-            text = subDep.get_attribute("innerHTML")
-            listSubDep.append({'name': text.split(' - ')[1], 'code': text.split(' - ')[0],
-                               'number': i + 1})
-        return listSubDep
+        try:
+            subDeps = self.driver.find_elements(By.XPATH,
+                                                "//ul[@class='eu-tree-root']/li[%s]/ul/li/span" % self.searchDep(dep))
+            if len(subDeps) == 0:
+                raise EmptyListSubDeps()
+            else:
+                for subDep in subDeps:
+                    text = subDep.get_attribute("innerHTML").replace('&nbsp;', ' ')
+                    listSubDep.append({'name': text.split(' - ')[1], 'code': text.split(' - ')[0]})
+        except DepsNotFound:
+            pass
+        finally:
+            return listSubDep
+
+    def getGroups(self, dep, subDep, semester):
+        link = self.linkProgress + semester + '/'
+        if self.driver.current_url != link:
+            self.driver.get(link)
+        listGroup = []
+        # try:
+        groups = self.driver.find_elements(By.XPATH,
+                                           "//ul[@class='eu-tree-root']/li[%s]/ul/li[%s]/ul/li/a" % (
+                                               self.searchDep(dep), self.searchSubDep(dep, subDep)))
+        if len(groups) == 0:
+            raise EmptyListGroups()
+        else:
+            for group in groups:
+                listGroup.append(
+                    {'name': group.get_attribute('text'), 'code': group.get_attribute('href').split('/')[-2],
+                     'levelEducation': group.get_attribute('data-stage'), 'isEmpty': group.get_attribute('class')})
+            return listGroup
+        # except DepsNotFound:
+        #     print('Не найден факультет')
+        # except SubDepsNotFound:
+        #     print('Не найдена кафедра')
+
+    def searchDep(self, code):
+        deps = self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/span")
+        if len(deps) == 0:
+            raise EmptyListDeps()
+        else:
+            for i, dep in enumerate(deps):
+                if dep.text.split(' - ')[0] == code:
+                    return str(i + 1)
+            raise DepsNotFound()
+
+    def searchSubDep(self, dep, code):
+        subDeps = self.driver.find_elements(By.XPATH,
+                                            "//ul[@class='eu-tree-root']/li[%s]/ul/li/span" % str(self.searchDep(dep)))
+        if len(subDeps) == 0:
+            raise EmptyListSubDeps()
+        else:
+            for i, subDep in enumerate(subDeps):
+                text = subDep.get_attribute("innerHTML").replace('&nbsp;', ' ')
+                if text.split(' - ')[0] == code:
+                    return str(i + 1)
+            raise SubDepsNotFound()
 
     def exit(self):
         try:
