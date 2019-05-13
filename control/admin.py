@@ -36,14 +36,14 @@ class SubdepartamentAdmin(admin.ModelAdmin):
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ['name', 'code']
     list_display = ('name', 'code')
-    list_filter = ['semester', 'subdepartament', 'levelEducation']
+    list_filter = ['isEmpty', 'semester', 'subdepartament', 'levelEducation']
+    list_per_page = 10
 
 
 @admin.register(Semester)
 class SemesterAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'code', 'session']
-    list_display = ('name', 'code', 'session')
-    list_filter = ['session']
+    search_fields = ['name', 'code']
+    list_display = ('name', 'code')
     list_per_page = 10
 
 

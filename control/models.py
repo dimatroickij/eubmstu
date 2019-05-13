@@ -45,7 +45,6 @@ class Student(models.Model):
 class Semester(models.Model):
     name = models.CharField('Название', max_length=40, unique=True)
     code = models.CharField('Код', max_length=20, blank=True, unique=True)
-    session = models.BooleanField('Сессия', default=True)
 
     def __str__(self):
         return self.name
@@ -61,18 +60,21 @@ class Group(models.Model):
                        ('magister', 'Магистратура'),
                        ('specialist', 'Специалитет / Аспирантура'))
     name = models.CharField('Название группы', max_length=10)
-    code = models.CharField('Код группы для сайта', max_length=50, unique=True)
+    code = models.CharField('Код группы для сайта', max_length=50)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр')
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
     levelEducation= models.CharField('Уровень образования', max_length=10, choices=LEVEL_EDUCATION, null=True)
-    isEmpty = models.BooleanField('Есть данные', default=False)
+    isEmpty = models.BooleanField('Данных в ЕУ нет', default=False)
     students = models.ManyToManyField(Student, verbose_name='Студенты')
 
+    def __str__(self):
+        return self.name
+
     class Meta:
-        ordering = ['name']
+        ordering = ['subdepartament']
         verbose_name = 'группа'
         verbose_name_plural = 'Группы'
-        unique_together = [['name', 'code']]
+        unique_together = [['name', 'code', 'semester']]
 
 
 # class StudentsGroup(models.Model):

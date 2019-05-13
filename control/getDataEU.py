@@ -170,6 +170,10 @@ class getDataEU:
                     return str(i + 1)
             raise SubDepsNotFound()
 
+    def getStudents(self):
+        z = self.driver.find_elements(By.XPATH,
+                                      "//ul[@class='eu-tree-root']/li/ul[@class='eu-tree-nodeset']/li[@class='eu-tree-closed']")
+
     def exit(self):
         try:
             self.driver.quit()
