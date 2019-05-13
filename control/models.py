@@ -36,6 +36,9 @@ class Student(models.Model):
     patronymic = models.CharField('Отчество', max_length=150, blank=True)
     gradebook = models.CharField('Номер зачётной книжки', max_length=10, unique=True)
 
+    def __str__(self):
+        return self.last_name + ' ' + self.first_name + ' ' + self.patronymic
+
     class Meta:
         ordering = ['gradebook']
         verbose_name = 'студента'

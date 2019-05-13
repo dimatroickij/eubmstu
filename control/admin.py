@@ -16,7 +16,9 @@ class DepartamentAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['first_name', 'last_name', 'patronymic', 'gradebook']
+    list_display = ('last_name', 'first_name', 'patronymic', 'gradebook')
+    list_per_page = 10
 
 
 @admin.register(Subject)

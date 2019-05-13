@@ -183,23 +183,26 @@ class getDataEU:
                                  'dep': x.get_attribute('text').split(' ')[-1]}, deps))
         return listLinkDeps
 
-    def getStudentsDep(self, link):
+    def getCountStudentsDep(self, link):
         if self.driver.current_url != link:
             self.driver.get(link)
-        students = []
         count = len(self.driver.find_elements(By.XPATH, "//table[@class='students-table']//tbody/tr/td[1]"))
-        for i in range(1, count):
-            student = {'name': self.driver.find_element(By.XPATH,
-                                                        "//table[@class='students-table']//tbody/tr[%s]/td[2]" % (
-                                                                i + 1)).text,
-                       'code': self.driver.find_element(By.XPATH,
-                                                        "//table[@class='students-table']//tbody/tr[%s]/td[3]" % (
-                                                                i + 1)).text,
-                       'group': self.driver.find_element(By.XPATH,
-                                                         "//table[@class='students-table']//tbody/tr[%s]/td[4]" % (
-                                                                 i + 1)).text}
-            students.append(student)
-        return students
+        return count
+
+    def getStudentDep(self, link, number):
+        if self.driver.current_url != link:
+            self.driver.get(link)
+        student = {'name': self.driver.find_element(By.XPATH,
+                                                    "//table[@class='students-table']//tbody/tr[%s]/td[2]" % (
+                                                        number)).text,
+                   'gradebook': self.driver.find_element(By.XPATH,
+                                                         "//table[@class='students-table']//tbody/tr[%s]/td[3]" % (
+                                                             number)).text,
+                   'group': self.driver.find_element(By.XPATH,
+                                                     "//table[@class='students-table']//tbody/tr[%s]/td[4]" % (
+                                                         number)).text}
+        return student
+
 
     def exit(self):
         try:
