@@ -28,9 +28,11 @@ class getDataEU:
         if vpn:
             self.linkProgress = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/progress3/'
             self.linkSession = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/session/'
+            self.contingent = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/contingent3/'
         else:
             self.linkProgress = 'https://eu.bmstu.ru/modules/progress3/'
             self.linkSession = 'https://eu.bmstu.ru/modules/session/'
+            self.contingent = 'https://eu.bmstu.ru/modules/contingent3/'
         self.isLogin = False
 
     # Авторизация на сайте
@@ -170,9 +172,34 @@ class getDataEU:
                     return str(i + 1)
             raise SubDepsNotFound()
 
-    def getStudents(self):
-        z = self.driver.find_elements(By.XPATH,
-                                      "//ul[@class='eu-tree-root']/li/ul[@class='eu-tree-nodeset']/li[@class='eu-tree-closed']")
+    def getLinkDeps(self):
+        if self.driver.current_url != self.contingent:
+            self.driver.get(self.contingent)
+        deps = self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/"
+                                                   "ul[@class='eu-tree-nodeset']/li/"
+                                                   "ul/li[@class='eu-tree-active']/a")
+        listLinkDeps = list(map(lambda x:
+                                {'link': x.get_attribute('href'),
+                                 'dep': x.get_attribute('text').split(' ')[-1]}, deps))
+        return listLinkDeps
+
+    def getStudentsDep(self, link):
+        if self.driver.current_url != link:
+            self.driver.get(link)
+        students = []
+        count = len(self.driver.find_elements(By.XPATH, "//table[@class='students-table']//tbody/tr/td[1]"))
+        for i in range(1, count):
+            student = {'name': self.driver.find_element(By.XPATH,
+                                                        "//table[@class='students-table']//tbody/tr[%s]/td[2]" % (
+                                                                i + 1)).text,
+                       'code': self.driver.find_element(By.XPATH,
+                                                        "//table[@class='students-table']//tbody/tr[%s]/td[3]" % (
+                                                                i + 1)).text,
+                       'group': self.driver.find_element(By.XPATH,
+                                                         "//table[@class='students-table']//tbody/tr[%s]/td[4]" % (
+                                                                 i + 1)).text}
+            students.append(student)
+        return students
 
     def exit(self):
         try:
