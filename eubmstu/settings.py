@@ -145,8 +145,8 @@ STATICFILES_DIRS = [
 ]
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-config.get('eubmstu', 'RECAPTCHA_PRIVATE_KEY')
-config.get('eubmstu', 'RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = config.get('recapcha', 'RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_PUBLIC_KEY = config.get('recapcha', 'RECAPTCHA_PUBLIC_KEY')
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465

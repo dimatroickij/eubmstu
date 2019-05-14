@@ -47,7 +47,7 @@ def updateSubdepartament():
     eu = getDataEU(USERNAME, PASSWORD, False, True)
     try:
         eu.login()
-        departaments = Departament.objects.all().order_by('code')
+        departaments = Departament.objects.exclude(code='АДМИН').order_by('code')
         for dep in departaments:
             subDeps = eu.getSubDepartaments(dep.code)
             for subDep in subDeps:
@@ -71,7 +71,7 @@ def updateGroup(sems):
         for semester in semesters:
             print(semester.name)
             try:
-                subDeps = Subdepartament.objects.all()
+                subDeps = Subdepartament.objects.exclude(departament__code='АДМИН')
                 for subDep in subDeps:
                     try:
                         # print(subDep.code)
@@ -80,6 +80,10 @@ def updateGroup(sems):
                         for group in groups:
                             # pass
                             try:
+                                if group['isEmpty'] == '':
+                                    isEmpty = False
+                                else:
+                                    isEmpty = True
                                 find = Group.objects.get(code=group['code'], semester=semester, name=group['name']).code
                             except Group.DoesNotExist:
                                 if group['isEmpty'] == '':
@@ -106,7 +110,6 @@ def updateGroup(sems):
 def updateStudent(listDep):
     eu = getDataEU(USERNAME, PASSWORD, False, True)
     try:
-        spisok = []
         eu.login()
         listLinkDeps = eu.getLinkDeps()
         for number in listDep:
@@ -114,21 +117,28 @@ def updateStudent(listDep):
             count = eu.getCountStudentsDep(listLinkDeps[number]['link'])
             print(listLinkDeps[number]['dep'] + ' ' + str(count))
             for num in range(1, count + 1):
+                print(str(num) + '/'  + str(count))
                 student = eu.getStudentDep(listLinkDeps[number]['link'], num)
-                print(student)
+                #print(student)
                 try:
                     find = Student.objects.get(gradebook=student['gradebook'])
                     z = find.gradebook
-                    if find.last_name != student['name'].split(' ')[0]:
-                        spisok.append(student)
+                    proveStudentInGroup(find, student['group'], Semester.objects.all().last().id)
                 except Student.DoesNotExist:
                     name = student['name'].split(' ')
                     if len(name) == 2:
                         name.append('')
-                    Student(last_name=name[0], first_name=name[1], patronymic=name[2],
-                            gradebook=student['gradebook']).save()
-        return spisok
+                    stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
+                                   gradebook=student['gradebook'])
+                    stud.save()
+                    proveStudentInGroup(stud, student['group'], Semester.objects.all().last().id)
     except Exception as err:
         return err
     finally:
         eu.exit()
+
+
+def proveStudentInGroup(student, group, semester):
+    gr = Group.objects.get(name=group, semester__id=semester)
+    gr.students.add(student)
+    gr.save()

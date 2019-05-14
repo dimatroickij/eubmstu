@@ -16,7 +16,7 @@ class Departament(models.Model):
 
 
 class Subdepartament(models.Model):
-    code = models.CharField('Код кафедры', max_length=10, unique=True)
+    code = models.CharField('Код кафедры', max_length=11, unique=True)
     name = models.CharField('Название кафедры', max_length=200)
     departament = models.ForeignKey(Departament, on_delete=models.CASCADE, verbose_name='Факультет')
 
