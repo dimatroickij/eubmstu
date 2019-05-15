@@ -95,9 +95,14 @@ class Subject(models.Model):
     name = models.CharField('Название', max_length=200)
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         verbose_name = 'предмет'
         verbose_name_plural = 'Предметы'
+        unique_together = [['name', 'subdepartament']]
+
 
 
 class Progress(models.Model):

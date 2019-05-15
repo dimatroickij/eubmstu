@@ -23,7 +23,10 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name', 'subdepartament']
+    list_display = ('name', 'subdepartament')
+    list_filter = ['subdepartament']
+    list_per_page = 10
 
 
 @admin.register(Subdepartament)

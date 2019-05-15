@@ -203,13 +203,104 @@ class getDataEU:
                                                          number)).text}
         return student
 
-    def getSubject(self, group, session):
-        link = self.linkProgress + session + '/group/' + group
+    def getSubject(self):
+        subjects = []
+        countSubjects = self.getCountSubjectsInGroup()
+        for i in range(1, countSubjects + 1):
+            subjects.append(
+                {'subDep': self.driver.find_element(By.XPATH,
+                                                    "//table[@class='standart_table']//tr[%s]/td[6]" % i).text,
+                 'subject': self.driver.find_element(By.XPATH,
+                                                     "//table[@class='standart_table']//tr[%s]/td[7]/span" % i).text})
+        return subjects
+
+    def getStudentsInGroup(self, i):
+        return {'student': self.driver.find_element(By.XPATH,
+                "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[2]" % i).text.split(' ')[0],
+                             'gradeBook': self.driver.find_element(By.XPATH,
+                                                                   "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[3]" % i).text}
+
+    def getProgress(self, i, count):
+        progress = []
+        for j in range(4, 4 + count):
+            progress.append(
+                {'subject': self.driver.find_element(By.XPATH,
+                                                      "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j).get_attribute('title'),
+                 'point': self.driver.find_element(By.XPATH,
+                                                      "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[%s]" % (i, j)).text})
+        return progress
+
+    def getCountSubjectsInGroup(self):
+        return len(self.driver.find_elements(By.XPATH,
+                                             "//div[@class='no-print']//table[@class='standart_table']//tr"))
+
+    def getCountStudentsInGroup(self):
+        return len(self.driver.find_elements(By.XPATH,
+                                             "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr/td[1]"))
+
+    def getProgressInGroup(self, group, semester, fSubjects, fStudents, fProgress):
+        link = self.linkProgress + semester + '/group/' + group + '/'
         if self.driver.current_url != link:
             self.driver.get(link)
+        progress = []
+        students = []
+        subjects = []
+        if fSubjects:
+            subjects = self.getSubject()
+        countSubjects = self.getCountSubjectsInGroup()
+        countStudents = self.getCountStudentsInGroup()
+        for i in range(1, countStudents + 1):
+            if fStudents:
+                students.append(self.getStudentsInGroup(i))
+            if fProgress:
+                progress.append(self.getProgress(i, countSubjects))
+        return {'subjects': subjects, 'students': students, 'progress': progress}
 
+    # Данные заголовка
+    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
+    #                                                                "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th")):
+    #                 listLine.append(line.get_attribute('title'))
+    #             listData.append(listLine)
+    #
+    #             # Данные
+    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
+    #                                                                "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr")):
+    #                 listLine = []
+    #                 for line in self.driver.find_elements(By.XPATH,
+    #                                                       "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%d]/td" % (
+    #                                                               i + 1)):
+    #                     listLine.append(line.text)
+    #                 listData.append(listLine)
+    #
+    #             # Данные хвоста
+    #             listLine = []
+    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
+    #                                                                "//table[@class='standart_table progress_students vertical_hover table-group']//tfoot//tr/td")):
+    #                 listLine.append(line.text)
+    #             listData.append(listLine)
+    #
+    #             listData[-1].insert(2, '')
+    #             listData[0][0] = '№'
+    #             listData[0][1] = 'ФИО'
+    #             listData[0][2] = '№ зач'
 
-
+    # СЕССИЯ
+    # for i, line in enumerate(self.driver.find_elements(By.XPATH,
+    #                                                                "//table[@class='eu-table sortable-table']//thead/tr/th")):
+    #                 listLine.append(line.text)
+    #             listData.append(listLine)
+    #
+    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
+    #                                                                "//table[@class='eu-table sortable-table']//tbody/tr")):
+    #                 listLine = []
+    #                 for line in self.driver.find_elements(By.XPATH,
+    #                                                       "//table[@class='eu-table sortable-table']//tbody/tr[%d]/td" % (
+    #                                                               i + 1)):
+    #                     listLine.append(line.text)
+    #                 listLine[1] = self.driver.find_element(By.XPATH,
+    #                                                        "//table[@class='eu-table sortable-table']//tbody/tr[%d]/td[2]/div/span" % (
+    #                                                                i + 1)).text
+    #                 listData.append(listLine)
     def exit(self):
         try:
             self.driver.quit()

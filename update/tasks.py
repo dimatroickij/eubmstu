@@ -1,7 +1,7 @@
 from psycopg2._psycopg import OperationalError
 
 from control.getDataEU import getDataEU
-from control.models import Semester, Departament, Subdepartament, Group, Student
+from control.models import Semester, Departament, Subdepartament, Group, Student, Subject
 from eubmstu.exceptions import EmptyListDeps, EmptyListSubDeps, EmptyListGroups, SubDepsNotFound
 from eubmstu.settings import USERNAME, PASSWORD
 
@@ -117,13 +117,13 @@ def updateStudent(listDep):
             count = eu.getCountStudentsDep(listLinkDeps[number]['link'])
             print(listLinkDeps[number]['dep'] + ' ' + str(count))
             for num in range(1, count + 1):
-                print(str(num) + '/'  + str(count))
+                print(str(num) + '/' + str(count))
                 student = eu.getStudentDep(listLinkDeps[number]['link'], num)
-                #print(student)
+                # print(student)
                 try:
                     find = Student.objects.get(gradebook=student['gradebook'])
                     z = find.gradebook
-                    #proveStudentInGroup(find, student['group'], Semester.objects.all().last().id)
+                    # proveStudentInGroup(find, student['group'], Semester.objects.all().last().id)
                 except Student.DoesNotExist:
                     name = student['name'].split(' ')
                     if len(name) == 2:
@@ -131,11 +131,67 @@ def updateStudent(listDep):
                     stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
                                    gradebook=student['gradebook'])
                     stud.save()
-                    #proveStudentInGroup(stud, student['group'], Semester.objects.all().last().id)
+                    # proveStudentInGroup(stud, student['group'], Semester.objects.all().last().id)
     except Exception as err:
         return err
     finally:
         eu.exit()
+
+
+def updateSubjectsInGroup(group, session):
+    eu = getDataEU(USERNAME, PASSWORD, False, True)
+    try:
+        eu.login()
+        listSubjects = eu.getProgressInGroup(group, session, True, False, False)
+        for subject in listSubjects['subjects']:
+            try:
+                find = Subject.objects.get(name=subject['subject'], subdepartament=Subdepartament.objects.get(code=subject['subDep'])).name
+            except Subject.DoesNotExist:
+                Subject(name=subject['subject'], subdepartament=Subdepartament.objects.get(code=subject['subDep'])).save()
+        return True
+    except Exception as err:
+        return err
+    finally:
+        eu.exit()
+
+
+def updateStudentsInGroup(code, semester):
+    group = Group.objects.get(code=code, semester__code=semester)
+    eu = getDataEU(USERNAME, PASSWORD, False, True)
+    try:
+        eu.login()
+        listStudents = eu.getProgressInGroup(code, semester, False, True, False)
+        for student in listStudents['students']:
+            find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
+            z = find.last_name
+            if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
+                lastGroup = Group.objects.get(students=find, semester__code=semester)
+                lastGroup.students.remove(find)
+            group.students.add(find)
+        return True
+    except Exception as err:
+        return err
+    finally:
+        eu.exit()
+
+# def updateProgressInGroup(code, semester):
+#     group = Group.objects.get(code=code, semester__code=semester)
+#     eu = getDataEU(USERNAME, PASSWORD, False, True)
+#     try:
+#         eu.login()
+#         listProgress = eu.getProgressInGroup(code, semester, False, False, True)
+#         for progress in listProgress['progress']:
+#             find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
+#             z = find.last_name
+#             if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
+#                 lastGroup = Group.objects.get(students=find, semester__code=semester)
+#                 lastGroup.students.remove(find)
+#             group.students.add(find)
+#         return True
+#     except Exception as err:
+#         return err
+#     finally:
+#         eu.exit()
 
 
 def proveStudentInGroup(student, group, semester):
