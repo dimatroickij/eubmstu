@@ -30,7 +30,7 @@ PASSWORD = config.get('login', 'password')
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'un4530)$d=(wc^u#c+z9bqj8&j39!zsbhi7_!9bp()p@%0845+'
+SECRET_KEY = config.get('secret', 'SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -91,8 +91,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'eubmstu',
-        'USER': 'USERNAME',
-        'PASSWORD': 'PASSWORD',
+        'USER': config.get('databases', 'USER'),
+        'PASSWORD': config.get('databases', 'PASSWORD'),
         'HOST': '127.0.0.1',
         'PORT': 'POST',
     }
@@ -149,13 +149,13 @@ RECAPTCHA_PUBLIC_KEY = config.get('recapcha', 'RECAPTCHA_PUBLIC_KEY')
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'dimatroickij1997@yandex.ru'
-EMAIL_HOST_PASSWORD = 'hbkpwspjabrtszeu'
+EMAIL_HOST_USER = config.get('email', 'EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config.get('email', 'EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-CELERY_BROKER_URL = 'amqp://dimatroickij:Troickij1@localhost:5672/eubmstu'
+CELERY_BROKER_URL = 'amqp://%s:%s@localhost:5672/eubmstu' % (config.get('celery', 'USER'), config.get('celery', 'PASSWORD'))
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
