@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     # 'django-celery-beat',
 
     'control',
-    'update'
+    'update',
+    'report'
 ]
 
 MIDDLEWARE = [

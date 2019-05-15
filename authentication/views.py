@@ -59,8 +59,10 @@ def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
+        print(User is None)
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
+    print(account_activation_token.check_token(user, token))
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
@@ -69,7 +71,7 @@ def activate(request, uidb64, token):
     else:
         messages.add_message(request, messages.SUCCESS, 'Ошибка подтверждения email')
     return redirect('authentication:profile')
-
+#localhost:8000/activate/Mw/56c-30a39db3df71891bfb5b
 
 from django.contrib.auth import views as auth_views, login
 
