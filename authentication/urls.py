@@ -7,5 +7,5 @@ app_name = 'authentication'
 urlpatterns = [
     path('accounts/registration/', check_recaptcha(views.registration), name='registration'),
     path('', views.profile, name='profile'),
-    path('accounts/change', views.change, name='chenge'),
+    path('accounts/change', views.change, name='change'),
 ]

@@ -24,31 +24,24 @@ def registration(request):
         return render(request, 'registration/signup.html', {'form': form})
     return redirect('profile')
 
-
+@login_required
 def profile(request):
     if request.user.is_authenticated:
-
-        return render(request, 'registration/profile.html', {})
-    else:
-        return redirect('login')
+        form = MyUserChangeForm(instance=request.user)
+        return render(request, 'registration/profile.html', {'form': form})
 
 
+@login_required
 def change(request):
-    if request.user.is_authenticated:
-        user = request.user
-        if request.method == 'POST':
-            form = MyUserChangeForm(request.POST, instance=user)
-            if form.is_valid():
-                user = form.save()
-                user.is_active = False
-                user.save()
-                messages.add_message(request, messages.SUCCESS, 'Данные успешно изменены')
-                return redirect('profile')
-        else:
-            form = MyUserChangeForm(instance=user)
-        return render(request, 'registration/changeProfile.html', {'form': form})
-    else:
-        return redirect('login')
+    user = request.user
+    if request.method == 'POST':
+        form = MyUserChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            user = form.save()
+            user.is_active = False
+            user.save()
+            messages.add_message(request, messages.SUCCESS, 'Данные успешно изменены')
+    return redirect('profile')
 
 
 from django.contrib.auth import views as auth_views, login

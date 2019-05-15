@@ -49,10 +49,14 @@ class MyUserChangeForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['username'].label = 'Логин'
         self.fields['email'].widget = forms.TextInput(attrs={'class': 'form-control', 'type': 'email'})
+        self.fields['email'].label = 'Email'
         self.fields['first_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['last_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['patronymic'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['password'].help_text = ''
+        #self.fields['work'].widget = forms.Select(attrs={'class': 'form-control'})
         # self.fields['last_login'].widget = forms.DateTimeInput(attrs={'readonly': True, 'class': 'form-control',
         #                                                                'type': 'datetime'})
         # self.fields['date_joined'].widget = forms.DateTimeInput(attrs={'readonly': True, 'class': 'form-control',
@@ -60,7 +64,7 @@ class MyUserChangeForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('username', 'last_name', 'first_name', 'patronymic', 'email')
+        fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'work')
 
 class MyPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
