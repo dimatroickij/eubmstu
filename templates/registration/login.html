@@ -25,13 +25,17 @@
                     <div class="form-group">
                         <label><a href="{% url 'password_reset' %}">Забыли пароль?</a></label>
                     </div>
-                    <div class="form-group g-recaptcha "
-                         data-sitekey="6Ler_p8UAAAAAAWj4ZgmYBnkNjEY2se44f9z-bYT"></div>
-                    {% if messages %}
-                        {% for message in messages %}
-                            {{ message }}
-                        {% endfor %}
-                    {% endif %}
+                    <div class="form-group"
+                         style="display: flex; flex-direction: column; align-items: center;justify-content: center">
+                        <div class="g-recaptcha"
+                             data-sitekey="6Ler_p8UAAAAAAWj4ZgmYBnkNjEY2se44f9z-bYT"></div>
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="invalid">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block">Авторизация
                         </button>

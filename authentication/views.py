@@ -51,7 +51,7 @@ def change(request):
 from django.contrib.auth import views as auth_views, login
 
 
-class RegisterView(auth_views.LoginView):
+class LoginView(auth_views.LoginView):
     form_class = LoginForm
     template_name = 'registration/login.html'
 
@@ -60,4 +60,4 @@ class RegisterView(auth_views.LoginView):
         if self.request.recaptcha_is_valid:
             login(self.request, form.get_user())
             return HttpResponseRedirect(self.get_success_url())
-        return redirect('login')
+        return render(self.request, 'registration/login.html', self.get_context_data(), {'errorCaptcha': 'is_invalid'})
