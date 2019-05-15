@@ -1,8 +1,13 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
 # Create your models here.
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
 from control.models import Subdepartament
 
 
@@ -20,3 +25,9 @@ class User(AbstractUser):
         unique_together = ('email',)
         verbose_name = 'пользователь'
         verbose_name_plural = 'Пользователи'
+
+from authentication.tasks import sendEmailConnfirm
+@receiver(post_save, sender=get_user_model())
+def user_post_save(instance, created, *args, **kwargs):
+    if created:
+        sendEmailConnfirm(instance.pk)

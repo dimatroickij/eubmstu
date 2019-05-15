@@ -324,21 +324,19 @@
                                                             <td align="left"
                                                                 style="padding:0;Margin:0;padding-bottom:15px;"><h2
                                                                     style="Margin:0;line-height:29px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:24px;font-style:normal;font-weight:normal;color:#333333;text-align:center;">
-                                                                <strong>Подтверждение регистрации</strong></h2></td>
+                                                                <strong>Новый пользователь</strong></h2></td>
                                                         </tr>
                                                         <tr style="border-collapse:collapse;">
                                                             <td align="center"
                                                                 style="padding:0;Margin:0;padding-top:20px;"><p
                                                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;">
-                                                                Для подтверждения регистрации необходимо перейти по
-                                                                ссылке ниже. Без подтверждения учётная запись неактивна.
-                                                                Ссылка действует 2 дня.</p></td>
+                                                                Для подтверждения нового пользователя {{ newUser.username }} необходимо перейти по ссылке ниже.</p></td>
                                                         </tr>
                                                         <tr style="border-collapse:collapse;">
                                                             <td align="center" style="padding:10px;Margin:0;"><span
                                                                     class="es-button-border"
                                                                     style="border-style:solid;border-color:#2c3e50;background:#2CB543;border-width:0px 0px 2px 0px;display:inline-block;border-radius:30px;width:auto;">
-                                                                <a href="https://troitskii.ru{% url 'authentication:activate' uidb64=uid token=token %}" class="es-button"
+                                                                <a href="https://troitskii.ru/admin/authentication/user/{{ newUser.id }}/change/" class="es-button"
                                                                    target="_blank"
                                                                    style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:18px;color:#FFFFFF;border-style:solid;border-color: #2c3e50;border-width:10px 20px 10px 20px;display:inline-block;background:#2c3e50;border-radius:30px;font-weight:normal;font-style:normal;line-height:22px;width:auto;text-align:center;">Подтвердить регистрацию</a> </span>
                                                             </td>

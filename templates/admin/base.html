@@ -18,18 +18,6 @@
                 }
             )
         </script>
-        {% block messages %}
-            {% if messages %}
-                <div class="card mt-4">
-                    <ul class="messagelist list-group list-group-flush">
-                        {% for message in messages %}
-                            <li{% if message.tags %}
-                                class="list-group-item text-{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        {% endblock messages %}
 
         <!-- Content -->
 

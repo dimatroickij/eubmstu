@@ -29,10 +29,8 @@
                          style="display: flex; flex-direction: column; align-items: center;justify-content: center">
                         <div class="g-recaptcha"
                              data-sitekey="6Ler_p8UAAAAAAWj4ZgmYBnkNjEY2se44f9z-bYT"></div>
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="invalid">{{ message }}</div>
-                            {% endfor %}
+                        {% if not is_valid %}
+                        <div class="invalid">Не пройдена RECaptcha. Повторите попытку</div>
                         {% endif %}
                     </div>
 

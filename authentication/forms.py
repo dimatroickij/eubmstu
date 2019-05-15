@@ -1,9 +1,9 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, PasswordChangeForm, \
-    SetPasswordForm, ReadOnlyPasswordHashField, UserChangeForm
 
-from authentication.models import User
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, PasswordChangeForm, \
+    SetPasswordForm, UserChangeForm
+
 
 
 class LoginForm(AuthenticationForm):
@@ -18,7 +18,7 @@ class LoginForm(AuthenticationForm):
         self.fields['password'].widget = forms.PasswordInput(attrs={'class': 'form-control'})
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ('username', 'password')
 
 
@@ -37,7 +37,7 @@ class MyUserCreationForm(UserCreationForm):
         #self.fields['work'].widget = forms.TextInput(attrs={'class': 'form-control'})
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'work', 'password1', 'password2')
 
 class MyUserChangeForm(UserChangeForm):
@@ -63,7 +63,7 @@ class MyUserChangeForm(UserChangeForm):
         #                                                                                 'type': 'datetime'})
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'work')
 
 class MyPasswordResetForm(PasswordResetForm):
@@ -72,7 +72,7 @@ class MyPasswordResetForm(PasswordResetForm):
         self.fields['email'].widget = forms.EmailInput(attrs={'class': 'form-control'})
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ('email')
 
 
@@ -84,7 +84,7 @@ class MyPasswordChangeForm(PasswordChangeForm):
         self.fields['new_password2'].widget = widget = forms.PasswordInput(attrs={'class': 'form-control'})
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ('old_password', 'new_password1', 'new_password2')
 
 
@@ -98,5 +98,5 @@ class MySetPasswordForm(SetPasswordForm):
         self.fields['new_password2'].widget = widget = forms.PasswordInput(attrs={'class': 'form-control'})
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ('new_password1', 'new_password2')

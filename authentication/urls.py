@@ -8,4 +8,5 @@ urlpatterns = [
     path('accounts/registration/', check_recaptcha(views.registration), name='registration'),
     path('', views.profile, name='profile'),
     path('accounts/change', views.change, name='change'),
+    path('activate/<str:uidb64>/<str:token>', views.activate, name='activate'),
 ]

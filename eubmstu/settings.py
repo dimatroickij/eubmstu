@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import platform
 from configparser import RawConfigParser
-config = RawConfigParser()
 
+config = RawConfigParser()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +40,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'authentication',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,7 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'django-celery-results',
     # 'django-celery-beat',
-    'authentication',
+
     'control',
     'update'
 ]
@@ -87,6 +88,7 @@ WSGI_APPLICATION = 'eubmstu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -100,6 +102,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
+AUTH_USER_MODEL = 'authentication.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -137,7 +140,7 @@ USERNAME_FIELD = 'username'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-AUTH_USER_MODEL = 'authentication.User'
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
@@ -155,7 +158,8 @@ EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-CELERY_BROKER_URL = 'amqp://%s:%s@localhost:5672/eubmstu' % (config.get('celery', 'USER'), config.get('celery', 'PASSWORD'))
+CELERY_BROKER_URL = 'amqp://%s:%s@localhost:5672/eubmstu' % (
+config.get('celery', 'USER'), config.get('celery', 'PASSWORD'))
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
