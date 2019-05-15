@@ -34,5 +34,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls'), ),
     path('', include('authentication.urls'), ),
     path('', include('control.urls'), ),
+    path('report/', include('report.urls'), ),
     path('favicon.ico', views.favicon),
 ]
