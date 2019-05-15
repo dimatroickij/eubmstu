@@ -203,6 +203,12 @@ class getDataEU:
                                                          number)).text}
         return student
 
+    def getSubject(self, group, session):
+        link = self.linkProgress + session + '/group/' + group
+        if self.driver.current_url != link:
+            self.driver.get(link)
+
+
 
     def exit(self):
         try:

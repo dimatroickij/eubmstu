@@ -123,7 +123,7 @@ def updateStudent(listDep):
                 try:
                     find = Student.objects.get(gradebook=student['gradebook'])
                     z = find.gradebook
-                    proveStudentInGroup(find, student['group'], Semester.objects.all().last().id)
+                    #proveStudentInGroup(find, student['group'], Semester.objects.all().last().id)
                 except Student.DoesNotExist:
                     name = student['name'].split(' ')
                     if len(name) == 2:
@@ -131,7 +131,7 @@ def updateStudent(listDep):
                     stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
                                    gradebook=student['gradebook'])
                     stud.save()
-                    proveStudentInGroup(stud, student['group'], Semester.objects.all().last().id)
+                    #proveStudentInGroup(stud, student['group'], Semester.objects.all().last().id)
     except Exception as err:
         return err
     finally:

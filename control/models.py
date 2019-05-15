@@ -34,7 +34,7 @@ class Student(models.Model):
     first_name = models.CharField('Имя', max_length=30)
     last_name = models.CharField('Фамилия', max_length=150)
     patronymic = models.CharField('Отчество', max_length=150, blank=True)
-    gradebook = models.CharField('Номер зачётной книжки', max_length=10, unique=True)
+    gradebook = models.CharField('Номер зачётной книжки', max_length=15, unique=True)
 
     def __str__(self):
         return self.last_name + ' ' + self.first_name + ' ' + self.patronymic
