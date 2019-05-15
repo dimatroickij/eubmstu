@@ -3,8 +3,12 @@ from django.db import models
 
 
 # Create your models here.
+from control.models import Subdepartament
+
+
 class User(AbstractUser):
     patronymic = models.CharField('Отчество', max_length=150, blank=True, help_text='Необязательное поле')
+    work = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Место работы')
 
     AbstractUser._meta.get_field('first_name').blank = False
     AbstractUser._meta.get_field('first_name').help_text = 'Обязательное поле'

@@ -2,8 +2,6 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, PasswordChangeForm, \
     SetPasswordForm, ReadOnlyPasswordHashField, UserChangeForm
-from snowpenguin.django.recaptcha2.fields import ReCaptchaField
-from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
 
 from authentication.models import User
 
@@ -15,7 +13,6 @@ class LoginForm(AuthenticationForm):
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
         super(AuthenticationForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget = forms.TextInput(attrs={'class': 'form-control'})
-        captcha = ReCaptchaField(widget=ReCaptchaWidget())
         # self.username_field = 'username'
         self.fields['username'].label = 'Логин'
         self.fields['password'].widget = forms.PasswordInput(attrs={'class': 'form-control'})
@@ -37,10 +34,11 @@ class MyUserCreationForm(UserCreationForm):
         self.fields['first_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['last_name'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['patronymic'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        #self.fields['work'].widget = forms.TextInput(attrs={'class': 'form-control'})
 
     class Meta:
         model = User
-        fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'password1', 'password2')
+        fields = ('username', 'last_name', 'first_name', 'patronymic', 'email', 'work', 'password1', 'password2')
 
 class MyUserChangeForm(UserChangeForm):
     """A form for updating users. Includes all the fields on

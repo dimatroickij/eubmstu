@@ -9,6 +9,5 @@ requests
 django-celery-results
 django-celery-beat
 celery
-django-recaptcha2
 selenium
 pyvirtualdisplay

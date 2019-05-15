@@ -19,7 +19,7 @@ from django.contrib.auth import views as auth_views
 
 from authentication.decorators import check_recaptcha
 from authentication.forms import LoginForm, MyPasswordResetForm, MyPasswordChangeForm
-from authentication.views import LoginView
+from authentication.views import LoginView, PasswordResetView
 from eubmstu import views
 
 urlpatterns = [
@@ -28,8 +28,7 @@ urlpatterns = [
          auth_views.PasswordChangeView.as_view(template_name='registration/password_change_form.html',
                                                form_class=MyPasswordChangeForm, success_url='/')),
     path('accounts/password_reset/',
-         auth_views.PasswordResetView.as_view(form_class=MyPasswordResetForm,
-                                              html_email_template_name='registration/password_reset_email.html')),
+         check_recaptcha(PasswordResetView.as_view())),
     path('accounts/login/',
          check_recaptcha(LoginView.as_view())),
     path('accounts/', include('django.contrib.auth.urls'), ),

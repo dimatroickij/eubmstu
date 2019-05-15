@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from authentication.forms import MyUserCreationForm, MyUserChangeForm, LoginForm
+from authentication.forms import MyUserCreationForm, MyUserChangeForm, LoginForm, MyPasswordResetForm
 from authentication.models import User
 
 
@@ -13,16 +13,17 @@ def registration(request):
         if request.method == 'POST':
             form = MyUserCreationForm(request.POST)
             if form.is_valid():
-                user = form.save()
-                user.is_active = False
-                user.save()
-                messages.add_message(request, messages.SUCCESS, 'Вы зарегистрированы. Ждите подтверждения.')
-                return JsonResponse('122', safe=False)
+                if request.recaptcha_is_valid:
+                    user = form.save()
+                    user.is_active = False
+                    user.save()
+                    messages.add_message(request, messages.SUCCESS, 'Вы зарегистрированы. Ждите подтверждения.')
+                return redirect('login')
         else:
             form = MyUserCreationForm()
         return render(request, 'registration/signup.html', {'form': form})
-    else:
-        return redirect('profile')
+    return redirect('profile')
+
 
 def profile(request):
     if request.user.is_authenticated:
@@ -30,6 +31,7 @@ def profile(request):
         return render(request, 'registration/profile.html', {})
     else:
         return redirect('login')
+
 
 def change(request):
     if request.user.is_authenticated:
@@ -48,6 +50,7 @@ def change(request):
     else:
         return redirect('login')
 
+
 from django.contrib.auth import views as auth_views, login
 
 
@@ -60,4 +63,24 @@ class LoginView(auth_views.LoginView):
         if self.request.recaptcha_is_valid:
             login(self.request, form.get_user())
             return HttpResponseRedirect(self.get_success_url())
-        return render(self.request, 'registration/login.html', self.get_context_data(), {'errorCaptcha': 'is_invalid'})
+        return render(self.request, 'registration/login.html', self.get_context_data())
+
+
+class PasswordResetView(auth_views.PasswordResetView):
+    form_class = MyPasswordResetForm
+
+    def form_valid(self, form):
+        if self.request.recaptcha_is_valid:
+            opts = {
+                'use_https': self.request.is_secure(),
+                'token_generator': self.token_generator,
+                'from_email': self.from_email,
+                'email_template_name': self.email_template_name,
+                'subject_template_name': self.subject_template_name,
+                'request': self.request,
+                'html_email_template_name': self.html_email_template_name,
+                'extra_email_context': self.extra_email_context,
+            }
+            form.save(**opts)
+            return super().form_valid(form)
+        return render(self.request, 'registration/password_reset_form.html', self.get_context_data())

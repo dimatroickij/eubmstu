@@ -14,14 +14,14 @@ class MyUserAdmin(UserAdmin):
     list_display = ('username', 'last_name', 'first_name', 'patronymic', 'is_active', 'is_superuser')
     fieldsets = (
         (None, {'fields': ('username', 'email')}),
-        ('Персональная информация', {'fields': ('last_name', 'first_name', 'patronymic')}),
+        ('Персональная информация', {'fields': ('last_name', 'first_name', 'patronymic', 'work')}),
         ('Права доступа', {'fields': ('is_active', 'is_superuser')}),
         # ('Важные даты', {'fields': ('date_joined', 'last_login')}),
     )
     add_fieldsets = (
         (None, {'fields': ('username', 'email')}),
         ('Пароль', {'fields': ('password1', 'password2')}),
-        ('Персональная информация', {'fields': ('last_name', 'first_name', 'patronymic')}),
+        ('Персональная информация', {'fields': ('last_name', 'first_name', 'patronymic', 'work')}),
         ('Права доступа', {'fields': ('is_active', 'is_superuser')}),
     )
 
