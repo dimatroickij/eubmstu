@@ -108,7 +108,9 @@ class Subject(models.Model):
 class Progress(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр', null=True)
     point = models.IntegerField('Количество баллов за предмет')
+
 
     class Meta:
         unique_together = [['subject', 'student']]
@@ -135,6 +137,7 @@ class Session(models.Model):
 
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр', null=True)
     type_rating = models.CharField('Тип оценки', max_length=5, choices=TYPE_RATING)
     rating = models.CharField('Оценка', max_length=4, choices=RATING)
 

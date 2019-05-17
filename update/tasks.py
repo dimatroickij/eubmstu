@@ -161,6 +161,7 @@ def updateStudentsInGroup(code, semester):
     try:
         eu.login()
         listStudents = eu.getProgressInGroup(code, semester, False, True, False)
+
         for student in listStudents['students']:
             find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
             z = find.last_name
