@@ -80,17 +80,6 @@ class Group(models.Model):
         unique_together = [['name', 'code', 'semester']]
 
 
-# class StudentsGroup(models.Model):
-#     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name='Группа')
-#     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
-#
-#     class Meta:
-#         ordering = ['group']
-#         unique_together = [['group', 'student']]
-#         verbose_name = 'СтудентыГруппы'
-#         verbose_name_plural = 'СтудентыГруппы'
-
-
 class Subject(models.Model):
     name = models.CharField('Название', max_length=200)
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
