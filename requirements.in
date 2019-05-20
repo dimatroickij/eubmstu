@@ -4,10 +4,9 @@ django-debug-toolbar
 gunicorn
 psycopg2-binary
 psycopg2
-psycopg2-binary
 requests
+celery
 django-celery-results
 django-celery-beat
-celery
 selenium
 pyvirtualdisplay

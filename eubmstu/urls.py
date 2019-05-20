@@ -36,4 +36,5 @@ urlpatterns = [
     path('', include('control.urls'), ),
     path('report/', include('report.urls'), ),
     path('favicon.ico', views.favicon),
+    path('api/', include('api.urls'), ),
 ]
