@@ -14,8 +14,8 @@ class getDataEU:
 
     # Инициализация класса
     # username, password - логин и пароль для входа в ЕУ
-    # teacher - является ли пльзователь преподавателем
-    # vpn - из како сети происходит вход: из внутренней или внешней
+    # teacher - является ли пользователь преподавателем
+    # vpn - из какой сети происходит вход: из внутренней или внешней
     def __init__(self, username, password, teacher, vpn):
         self.options = webdriver.ChromeOptions()
         if platform.system() == 'Linux':
