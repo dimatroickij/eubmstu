@@ -98,6 +98,9 @@ DATABASES = {
         'PASSWORD': config.get('databases', 'PASSWORD'),
         'HOST': '127.0.0.1',
         'PORT': 'POST',
+        'TEST': {
+            'NAME': 'eubmstu_test',
+        }
     }
 }
 
@@ -160,7 +163,7 @@ SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CELERY_BROKER_URL = 'amqp://%s:%s@localhost:5672/eubmstu' % (
-config.get('celery', 'USER'), config.get('celery', 'PASSWORD'))
+    config.get('celery', 'USER'), config.get('celery', 'PASSWORD'))
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
