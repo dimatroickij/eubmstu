@@ -1,6 +1,5 @@
 import os
 import platform
-from telnetlib import EC
 
 from pyvirtualdisplay import Display
 from selenium import webdriver
@@ -12,7 +11,11 @@ from eubmstu.settings import BASE_DIR
 
 
 class getDataEU:
+
     # Инициализация класса
+    # username, password - логин и пароль для входа в ЕУ
+    # teacher - является ли пльзователь преподавателем
+    # vpn - из како сети происходит вход: из внутренней или внешней
     def __init__(self, username, password, teacher, vpn):
         self.options = webdriver.ChromeOptions()
         if platform.system() == 'Linux':
@@ -37,39 +40,36 @@ class getDataEU:
 
     # Авторизация на сайте
     def login(self):
-        if self.vpn:
-            self.driver.get("https://webvpn.bmstu.ru/+CSCOE+/logon.html")
-            self.driver.find_element(By.NAME, 'username').send_keys(self.username)
-            self.driver.find_element(By.NAME, 'password').send_keys(self.password)
-            self.driver.find_element(By.NAME, 'Login').click()
-            # element = WebDriverWait(self.driver, 30).until(
-            #     EC.title_is("BMSTU Remote Access"))
-            self.driver.execute_script(
-                "parent.doURL('75676763663A2F2F72682E6F7A6667682E6568',[{ 'l' : '4829322D03D1606FB09AE9AF59A271D3', 'n' : 1}],'get',false,'no', false)")
-        else:
-            self.driver.get("http://eu.bmstu.ru")
-        if self.teacher:
-            self.driver.get(
-                self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/a[2]").get_attribute(
-                    'href'))
-            self.driver.find_element(By.NAME, 'login').send_keys(self.username)
-            self.driver.find_element(By.NAME, 'password').send_keys(self.password)
-            self.driver.find_element(By.NAME, 'send').click()
-        else:
-            # element = WebDriverWait(self.driver, 30).until(
-            #     EC.title_is('НОЦ "ЭУ" Авторизация'))
-            self.driver.get(
-                self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/a[1]").get_attribute(
-                    'href'))
-            self.driver.find_element(By.NAME, 'username').send_keys(self.username)
-            self.driver.find_element(By.NAME, 'password').send_keys(self.password)
-            self.driver.find_element(By.NAME, 'submit').click()
-        # WebDriverWait(self.driver, 30).until(EC.visibility_of_element_located((By.ID, 'workarea')))
-        self.isLogin = True
-        # except Exception as e:
-        #     print(str(e))
-        # self.driver.quit()
+        try:
+            if self.vpn:
+                self.driver.get("https://webvpn.bmstu.ru/+CSCOE+/logon.html")
+                self.driver.find_element(By.NAME, 'username').send_keys(self.username)
+                self.driver.find_element(By.NAME, 'password').send_keys(self.password)
+                self.driver.find_element(By.NAME, 'Login').click()
+                self.driver.execute_script(
+                    "parent.doURL('75676763663A2F2F72682E6F7A6667682E6568',[{ 'l' : '4829322D03D1606FB09AE9AF59A271D3', 'n' : 1}],'get',false,'no', false)")
+            else:
+                self.driver.get("http://eu.bmstu.ru")
+            if self.teacher:
+                self.driver.get(
+                    self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/a[2]").get_attribute(
+                        'href'))
+                self.driver.find_element(By.NAME, 'login').send_keys(self.username)
+                self.driver.find_element(By.NAME, 'password').send_keys(self.password)
+                self.driver.find_element(By.NAME, 'send').click()
+            else:
+                self.driver.get(
+                    self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/a[1]").get_attribute(
+                        'href'))
+                self.driver.find_element(By.NAME, 'username').send_keys(self.username)
+                self.driver.find_element(By.NAME, 'password').send_keys(self.password)
+                self.driver.find_element(By.NAME, 'submit').click()
+            self.isLogin = True
+        except Exception as e:
+            print(str(e))
+        self.driver.quit()
 
+    # Получение списка семестров
     def getSemesters(self):
         listTerm = []
         self.driver.get(self.linkProgress)
@@ -97,6 +97,7 @@ class getDataEU:
              'session': True})
         return listTerm
 
+    # Получение списка факультетов
     def getDepartaments(self):
         listDep = []
         self.driver.get(self.linkProgress)
@@ -110,6 +111,8 @@ class getDataEU:
                         {'name': dep.text.split(' - ')[1:], 'code': dep.text.split(' - ')[0]})
             return listDep
 
+    # Получение списка кафедр
+    # dep - код факультета
     def getSubDepartaments(self, dep):
         if self.driver.current_url != self.linkProgress:
             self.driver.get(self.linkProgress)
@@ -128,12 +131,15 @@ class getDataEU:
         finally:
             return listSubDep
 
+    # Получение списка групп
+    # dep - код факультета
+    # subDep - код кафедры
+    # semester - код семестра
     def getGroups(self, dep, subDep, semester):
         link = self.linkProgress + semester + '/'
         if self.driver.current_url != link:
             self.driver.get(link)
         listGroup = []
-        # try:
         groups = self.driver.find_elements(By.XPATH,
                                            "//ul[@class='eu-tree-root']/li[%s]/ul/li[%s]/ul/li/a" % (
                                                self.searchDep(dep), self.searchSubDep(dep, subDep)))
@@ -145,11 +151,8 @@ class getDataEU:
                     {'name': group.get_attribute('text'), 'code': group.get_attribute('href').split('/')[-2],
                      'levelEducation': group.get_attribute('data-stage'), 'isEmpty': group.get_attribute('class')})
             return listGroup
-        # except DepsNotFound:
-        #     print('Не найден факультет')
-        # except SubDepsNotFound:
-        #     print('Не найдена кафедра')
 
+    # Поиск факультета на странице по коду факультета
     def searchDep(self, code):
         deps = self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/span")
         if len(deps) == 0:
@@ -160,6 +163,7 @@ class getDataEU:
                     return str(i + 1)
             raise DepsNotFound()
 
+    # Поиск кафедры по на странице по коду факультета и кафедры
     def searchSubDep(self, dep, code):
         subDeps = self.driver.find_elements(By.XPATH,
                                             "//ul[@class='eu-tree-root']/li[%s]/ul/li/span" % str(self.searchDep(dep)))
@@ -172,6 +176,7 @@ class getDataEU:
                     return str(i + 1)
             raise SubDepsNotFound()
 
+    # Получение списка факультетов в модуле "Контингент"
     def getLinkDeps(self):
         if self.driver.current_url != self.contingent:
             self.driver.get(self.contingent)
@@ -183,12 +188,17 @@ class getDataEU:
                                  'dep': x.get_attribute('text').split(' ')[-1]}, deps))
         return listLinkDeps
 
+    # Получение количества студентов на факультете из модуля "Контингент"
+    # link - ссылка на факультет
     def getCountStudentsDep(self, link):
         if self.driver.current_url != link:
             self.driver.get(link)
         count = len(self.driver.find_elements(By.XPATH, "//table[@class='students-table']//tbody/tr/td[1]"))
         return count
 
+    # Получение списка студентов на факультете из модуля "Контингент"
+    # link - ссылка на факультет
+    # number - порядковый номер студента в таблице
     def getStudentDep(self, link, number):
         if self.driver.current_url != link:
             self.driver.get(link)
@@ -203,6 +213,7 @@ class getDataEU:
                                                          number)).text}
         return student
 
+    # Получение списка предметов в группе
     def getSubject(self):
         subjects = []
         countSubjects = self.getCountSubjectsInGroup()
@@ -214,30 +225,42 @@ class getDataEU:
                                                      "//table[@class='standart_table']//tr[%s]/td[7]/span" % i).text})
         return subjects
 
+    # Получение списка студентов в группе
     def getStudentsInGroup(self, i):
         return {'student': self.driver.find_element(By.XPATH,
-                "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[2]" % i).text.split(' ')[0],
-                             'gradeBook': self.driver.find_element(By.XPATH,
-                                                                   "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[3]" % i).text}
+                                                    "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[2]" % i).text.split(
+            ' ')[0],
+                'gradeBook': self.driver.find_element(By.XPATH,
+                                                      "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[3]" % i).text}
 
+    # Получение результатов текущей успеваемости группы
+    # count - количество предметов у данной группы
     def getProgress(self, i, count):
         progress = []
         for j in range(4, 4 + count):
             progress.append(
                 {'subject': self.driver.find_element(By.XPATH,
-                                                      "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j).get_attribute('title'),
-                 'point': self.driver.find_element(By.XPATH,
-                                                      "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[%s]" % (i, j)).text})
+                                                     "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j).get_attribute(
+                    'title'),
+                    'point': self.driver.find_element(By.XPATH,
+                                                      "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[%s]" % (
+                                                          i, j)).text})
         return progress
 
+    # Количество предметов у данной группы
     def getCountSubjectsInGroup(self):
         return len(self.driver.find_elements(By.XPATH,
                                              "//div[@class='no-print']//table[@class='standart_table']//tr"))
 
+    # Количество студентов в данной группе
     def getCountStudentsInGroup(self):
         return len(self.driver.find_elements(By.XPATH,
                                              "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr/td[1]"))
 
+    # Получение текущей успеваемости группы по студентам и получение предметов у группы (работа функции по флагам)
+    # group - код группы
+    # semester - код семестра
+    # fSubjects, fStudents, fProgress - флаги, показывающие, какие данные нужны)
     def getProgressInGroup(self, group, semester, fSubjects, fStudents, fProgress):
         link = self.linkProgress + semester + '/group/' + group + '/'
         if self.driver.current_url != link:
@@ -256,34 +279,6 @@ class getDataEU:
                 progress.append(self.getProgress(i, countSubjects))
         return {'subjects': subjects, 'students': students, 'progress': progress}
 
-    # Данные заголовка
-    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
-    #                                                                "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th")):
-    #                 listLine.append(line.get_attribute('title'))
-    #             listData.append(listLine)
-    #
-    #             # Данные
-    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
-    #                                                                "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr")):
-    #                 listLine = []
-    #                 for line in self.driver.find_elements(By.XPATH,
-    #                                                       "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%d]/td" % (
-    #                                                               i + 1)):
-    #                     listLine.append(line.text)
-    #                 listData.append(listLine)
-    #
-    #             # Данные хвоста
-    #             listLine = []
-    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
-    #                                                                "//table[@class='standart_table progress_students vertical_hover table-group']//tfoot//tr/td")):
-    #                 listLine.append(line.text)
-    #             listData.append(listLine)
-    #
-    #             listData[-1].insert(2, '')
-    #             listData[0][0] = '№'
-    #             listData[0][1] = 'ФИО'
-    #             listData[0][2] = '№ зач'
-
     # СЕССИЯ
     # for i, line in enumerate(self.driver.find_elements(By.XPATH,
     #                                                                "//table[@class='eu-table sortable-table']//thead/tr/th")):
@@ -301,6 +296,8 @@ class getDataEU:
     #                                                        "//table[@class='eu-table sortable-table']//tbody/tr[%d]/td[2]/div/span" % (
     #                                                                i + 1)).text
     #                 listData.append(listLine)
+
+    # выход из системы
     def exit(self):
         try:
             self.driver.quit()

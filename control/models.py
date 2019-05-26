@@ -35,6 +35,7 @@ class Student(models.Model):
     last_name = models.CharField('Фамилия', max_length=150)
     patronymic = models.CharField('Отчество', max_length=150, blank=True)
     gradebook = models.CharField('Номер зачётной книжки', max_length=15, unique=True)
+    isStudying = models.BooleanField('Обучается ли сейчас студент', default=True)
 
     def __str__(self):
         return self.last_name + ' ' + self.first_name + ' ' + self.patronymic

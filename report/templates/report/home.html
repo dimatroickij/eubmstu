@@ -1,4 +1,55 @@
 {% extends 'application.html' %}
-{% block title %}Главная страница{% endblock %}
+{% block title %}Отчёты{% endblock %}
 {% block contentSite %}
+    <div class="container">
+        <div class="search">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Введите текст"
+                       aria-label="Recipient's username"
+                       aria-describedby="button-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-primary" type="button" id="button-addon2">Найти</button>
+                </div>
+            </div>
+        </div>
+        <div class="report">
+            <div class="card mb-2">
+                <div class="card-body"
+                     style="display: flex; align-items: center;justify-content: center;background-color: #2c3e50; color: white">
+                    <b class="material-icons mr-3">add</b>
+                    <h5>Создать отчёт</h5>
+                </div>
+            </div>
+            {% for i in report %}
+                <div class="card mb-2">
+                    <div class="card-body"
+                         style="display: flex; align-items: flex-start;justify-content: space-between">
+                        <h6>Отчёт {{ i }}</h6>
+                        <small class="text-muted">25.05.2019 12:12:12</small>
+                        <div>
+                            <i class="material-icons">save</i>
+                            <i class="material-icons">clear</i>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item active"><span class="page-link" style="cursor:pointer;">1</span></li>
+
+            <li class="page-item"><a class="page-link" href="?p=1">2</a></li>
+
+            <li class="page-item"><a class="page-link" href="?p=2">3</a></li>
+
+            <li class="page-item"><a class="page-link" href="?p=3">4</a></li>
+
+            <li class="page-item"><a class="page-link" href="#">… </a></li>
+
+            <li class="page-item"><a class="page-link" href="?p=3000">9</a></li>
+
+            <li class="page-item"><a class="page-link" href="?p=3001">10</a></li>
+
+        </ul>
+    </div>
 {% endblock %}
