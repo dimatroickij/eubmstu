@@ -28,7 +28,7 @@ urlpatterns = [
          auth_views.PasswordChangeView.as_view(template_name='registration/password_change_form.html',
                                                form_class=MyPasswordChangeForm, success_url='/')),
     path('accounts/password_reset/',
-         check_recaptcha(PasswordResetView.as_view())),
+         check_recaptcha(PasswordResetView.as_view(email_template_name='email/password_reset_email.html'))),
     path('accounts/login/',
          check_recaptcha(LoginView.as_view())),
     path('accounts/', include('django.contrib.auth.urls'), ),
