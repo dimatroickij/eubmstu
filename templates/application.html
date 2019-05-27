@@ -47,7 +47,8 @@
                 <ul class="navbar-nav mr-auto">
                     {% if user.is_staff %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'report:home' %}">Отчёты<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href="{% url 'report:home' %}">Отчёты<span
+                                    class="sr-only">(current)</span></a>
                         </li>
                     {% endif %}
                     {% if user.is_superuser %}
@@ -55,6 +56,9 @@
                             <a class="nav-link" href="/admin">Администрирование сайта</a>
                         </li>
                     {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'control:faq' %}">Помощь<span class="sr-only">(current)</span></a>
+                    </li>
                 </ul>
                 {% if request.user.is_authenticated %}
                     <ul class="nav navbar-nav navbar-right">
@@ -66,7 +70,6 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <a class="dropdown-item" href="/">Личные данные</a>
-                                <a class="dropdown-item" href="{% url 'control:faq' %}">Помощь</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{% url 'logout' %}">Выход</a>
                             </div>

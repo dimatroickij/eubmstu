@@ -4,5 +4,5 @@ from django.shortcuts import render
 # Create your views here.
 @login_required
 def home(request):
-    report = range(1, 9)
+    report = range(1, 7)
     return render(request,'report/home.html', {'report': report})
