@@ -67,7 +67,7 @@ class getDataEU:
             self.isLogin = True
         except Exception as e:
             print(str(e))
-        self.driver.quit()
+            self.driver.quit()
 
     # Получение списка семестров
     def getSemesters(self):

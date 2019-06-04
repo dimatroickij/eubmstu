@@ -1,31 +1,30 @@
 from psycopg2._psycopg import OperationalError
 
 from control.getDataEU import getDataEU
-from control.models import Semester, Departament, Subdepartament, Group, Student, Subject
+from control.models import Semester, Departament, Subdepartament, Group, Student, Subject, Progress
 from eubmstu.exceptions import EmptyListDeps, EmptyListSubDeps, EmptyListGroups, SubDepsNotFound
 from eubmstu.settings import USERNAME, PASSWORD
+
 
 class updateData:
 
     def __init__(self):
-        pass
+        self.eu = getDataEU(USERNAME, PASSWORD, False, True)
+        self.eu.login()
 
     def updateSemester(self):
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
-            eu.login()
             semesters = eu.getSemesters()
             for semester in semesters:
                 try:
                     find = Semester.objects.get(name=semester['name']).name
                 except Semester.DoesNotExist:
                     save = Semester(name=semester['name'], code=semester['link'], session=semester['session']).save()
-            eu.exit()
+            self.eu.exit()
             return True
         except Exception as err:
-            eu.exit()
+            self.eu.exit()
             return err
-
 
     def updateDepartament(self):
         eu = getDataEU(USERNAME, PASSWORD, False, True)
@@ -46,7 +45,6 @@ class updateData:
             eu.exit()
             return err
 
-
     def updateSubdepartament(self):
         eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
@@ -65,7 +63,6 @@ class updateData:
         except Exception as err:
             eu.exit()
             return err
-
 
     def updateGroup(self, sems):
         eu = getDataEU(USERNAME, PASSWORD, False, True)
@@ -88,13 +85,15 @@ class updateData:
                                         isEmpty = False
                                     else:
                                         isEmpty = True
-                                    find = Group.objects.get(code=group['code'], semester=semester, name=group['name']).code
+                                    find = Group.objects.get(code=group['code'], semester=semester,
+                                                             name=group['name']).code
                                 except Group.DoesNotExist:
                                     if group['isEmpty'] == '':
                                         isEmpty = False
                                     else:
                                         isEmpty = True
-                                    Group(name=group['name'], code=group['code'], semester=semester, subdepartament=subDep,
+                                    Group(name=group['name'], code=group['code'], semester=semester,
+                                          subdepartament=subDep,
                                           levelEducation=group['levelEducation'], isEmpty=isEmpty).save()
                         except SubDepsNotFound:
                             pass
@@ -109,7 +108,6 @@ class updateData:
             return err
         finally:
             eu.exit()
-
 
     def updateStudent(self, listDep):
         eu = getDataEU(USERNAME, PASSWORD, False, True)
@@ -141,7 +139,6 @@ class updateData:
         finally:
             eu.exit()
 
-
     def updateSubjectsInGroup(self, group, session):
         eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
@@ -149,15 +146,16 @@ class updateData:
             listSubjects = eu.getProgressInGroup(group, session, True, False, False)
             for subject in listSubjects['subjects']:
                 try:
-                    find = Subject.objects.get(name=subject['subject'], subdepartament=Subdepartament.objects.get(code=subject['subDep'])).name
+                    find = Subject.objects.get(name=subject['subject'],
+                                               subdepartament=Subdepartament.objects.get(code=subject['subDep'])).name
                 except Subject.DoesNotExist:
-                    Subject(name=subject['subject'], subdepartament=Subdepartament.objects.get(code=subject['subDep'])).save()
+                    Subject(name=subject['subject'],
+                            subdepartament=Subdepartament.objects.get(code=subject['subDep'])).save()
             return True
         except Exception as err:
             return err
         finally:
             eu.exit()
-
 
     def updateStudentsInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
@@ -179,25 +177,30 @@ class updateData:
         finally:
             eu.exit()
 
-    def updateProgressInGroup(self, code, semester, student):
+    def updateProgressInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
-            eu.login()
-            listProgress = eu.getProgressInGroup(code, semester, False, False, True)
-            for progress in listProgress['progress']:
-                find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
-                z = find.last_name
-                if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
-                    lastGroup = Group.objects.get(students=find, semester__code=semester)
-                    lastGroup.students.remove(find)
-                group.students.add(find)
+            listProgress = self.eu.getProgressInGroup(code, semester, True, False, True)
+            subjects = []
+            for subject in listProgress['subjects']:
+                subjects.append(Subject.objects.get(name=subject['subject'],
+                                               subdepartament=Subdepartament.objects.get(code=subject['subDep'])))
+            for i, progress in enumerate(listProgress['progress']):
+                find = group.students.all()
+
+                try:
+                    record = Progress.objects.get(subject=subjects[i], student=find[i],
+                                                  semester=Semester.objects.get(code=semester))
+                    record.point = progress['point']
+                    record.save()
+                except Progress.DoesNotExist:
+                    Progress(subject=subjects[i], student=find[i],
+                             semester=Semester.objects.get(code=semester), point=progress['point']).save()
             return True
         except Exception as err:
             return err
         finally:
-            eu.exit()
-
+            pass#eu.exit()
 
     def proveStudentInGroup(self, student, group, semester):
         gr = Group.objects.get(name=group, semester__id=semester)
