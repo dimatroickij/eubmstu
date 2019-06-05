@@ -134,7 +134,7 @@ class updateData:
                     find.save()
                 except Subject.DoesNotExist:
                     newRecord = Subject(name=subject['subject'],
-                            subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                                        subdepartament=Subdepartament.objects.get(code=subject['subDep']))
                     newRecord.save()
                     newRecord.groups.add(group)
                     newRecord.save()
@@ -145,7 +145,7 @@ class updateData:
     def updateStudentsInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            #добавить проверку на то, что студент может перевестись в другую группу и в этой его нужно удалить
+            # добавить проверку на то, что студент может перевестись в другую группу и в этой его нужно удалить
             newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
             for student in newListStudents['students']:
                 find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
@@ -161,21 +161,19 @@ class updateData:
         group = Group.objects.get(code=code, semester__code=semester)
         try:
             listProgress = self.eu.getProgressInGroup(code, semester, False, False, True)
-            subjects = []
-            #group.students.all().order_by('last_name', 'first_name', 'patronymic')
-            for subject in listProgress['subjects']:
-                subjects.append(Subject.objects.get(name=subject['subject'],
-                                                    subdepartament=Subdepartament.objects.get(code=subject['subDep'])))
+            students = group.students.all().order_by('last_name', 'first_name', 'patronymic')
+            subjects = Subject.objects.filter(groups=group)
             for i, progress in enumerate(listProgress['progress']):
-                find = group.students.all()
-                try:
-                    record = Progress.objects.get(subject=subjects[i], student=find[i],
-                                                  semester=Semester.objects.get(code=semester))
-                    record.point = progress['point']
-                    record.save()
-                except Progress.DoesNotExist:
-                    Progress(subject=subjects[i], student=find[i],
-                             semester=Semester.objects.get(code=semester), point=progress['point']).save()
+                for cell in progress:
+                    subject = subjects.get(name=cell['subject'])
+                    try:
+                        record = Progress.objects.get(subject=subject, student=students[i],
+                                                      semester=group.semester)
+                        record.point = progress['point']
+                        record.save()
+                    except Progress.DoesNotExist:
+                        Progress(subject=subject, student=students[i], semester=group.semester,
+                                 point=cell['point']).save()
             return True
         except Exception as err:
             return err
