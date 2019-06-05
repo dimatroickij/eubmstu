@@ -67,7 +67,7 @@ class Group(models.Model):
     code = models.CharField('Код группы для сайта', max_length=50)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр')
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
-    levelEducation= models.CharField('Уровень образования', max_length=10, choices=LEVEL_EDUCATION, null=True)
+    levelEducation = models.CharField('Уровень образования', max_length=10, choices=LEVEL_EDUCATION, null=True)
     isEmpty = models.BooleanField('Данных в ЕУ нет', default=False)
     students = models.ManyToManyField(Student, verbose_name='Студенты')
 
@@ -84,6 +84,7 @@ class Group(models.Model):
 class Subject(models.Model):
     name = models.CharField('Название', max_length=200)
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
+    groups = models.ManyToManyField(Group, verbose_name='Группы')
 
     def __str__(self):
         return self.name
@@ -94,13 +95,10 @@ class Subject(models.Model):
         unique_together = [['name', 'subdepartament']]
 
 
-
 class Progress(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
-    semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр', null=True)
     point = models.IntegerField('Количество баллов за предмет')
-
 
     class Meta:
         unique_together = [['subject', 'student']]
@@ -127,7 +125,6 @@ class Session(models.Model):
 
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
-    semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр', null=True)
     type_rating = models.CharField('Тип оценки', max_length=5, choices=TYPE_RATING)
     rating = models.CharField('Оценка', max_length=4, choices=RATING)
 

@@ -14,24 +14,19 @@ class updateData:
 
     def updateSemester(self):
         try:
-            semesters = eu.getSemesters()
+            semesters = self.eu.getSemesters()
             for semester in semesters:
                 try:
                     find = Semester.objects.get(name=semester['name']).name
                 except Semester.DoesNotExist:
                     save = Semester(name=semester['name'], code=semester['link'], session=semester['session']).save()
-            self.eu.exit()
             return True
         except Exception as err:
-            self.eu.exit()
             return err
 
     def updateDepartament(self):
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
-
-            eu.login()
-            departaments = eu.getDepartaments()
+            departaments = self.eu.getDepartaments()
             for departament in departaments:
                 try:
                     find = Departament.objects.get(code=departament['code']).code
@@ -39,16 +34,14 @@ class updateData:
                     save = Departament(name=departament['name'], code=departament['code'],
                                        number=departament['number']).save()
                 print(departament)
-            eu.exit()
+            self.eu.exit()
             return True
         except Exception as err:
-            eu.exit()
             return err
 
     def updateSubdepartament(self):
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
+        # eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
-            eu.login()
             departaments = Departament.objects.exclude(code='АДМИН').order_by('code')
             for dep in departaments:
                 subDeps = eu.getSubDepartaments(dep.code)
@@ -58,16 +51,13 @@ class updateData:
                     except Subdepartament.DoesNotExist:
                         save = Subdepartament(name=subDep['name'], code=subDep['code'],
                                               number=subDep['number'], departament=dep).save()
-            eu.exit()
+            # eu.exit()
             return True
         except Exception as err:
-            eu.exit()
             return err
 
     def updateGroup(self, sems):
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
-            eu.login()
             semesters = Semester.objects.filter(pk__in=sems)
             for semester in semesters:
                 print(semester.name)
@@ -106,21 +96,16 @@ class updateData:
             print('Ошибка базы данных')
         except Exception as err:
             return err
-        finally:
-            eu.exit()
 
     def updateStudent(self, listDep):
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
-            eu.login()
-            listLinkDeps = eu.getLinkDeps()
+            listLinkDeps = self.eu.getLinkDeps()
             for number in listDep:
-
-                count = eu.getCountStudentsDep(listLinkDeps[number]['link'])
+                count = self.eu.getCountStudentsDep(listLinkDeps[number]['link'])
                 print(listLinkDeps[number]['dep'] + ' ' + str(count))
                 for num in range(1, count + 1):
                     print(str(num) + '/' + str(count))
-                    student = eu.getStudentDep(listLinkDeps[number]['link'], num)
+                    student = self.eu.getStudentDep(listLinkDeps[number]['link'], num)
                     # print(student)
                     try:
                         find = Student.objects.get(gradebook=student['gradebook'])
@@ -136,37 +121,34 @@ class updateData:
                         # proveStudentInGroup(stud, student['group'], Semester.objects.all().last().id)
         except Exception as err:
             return err
-        finally:
-            eu.exit()
 
-    def updateSubjectsInGroup(self, group, session):
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
+    def updateSubjectsInGroup(self, groupCode, session):
+        group = Group.objects.get(code=groupCode)
         try:
-            eu.login()
-            listSubjects = eu.getProgressInGroup(group, session, True, False, False)
+            listSubjects = self.eu.getProgressInGroup(groupCode, session, True, False, False)
             for subject in listSubjects['subjects']:
                 try:
                     find = Subject.objects.get(name=subject['subject'],
-                                               subdepartament=Subdepartament.objects.get(code=subject['subDep'])).name
+                                               subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                    find.groups.add(group)
+                    find.save()
                 except Subject.DoesNotExist:
-                    Subject(name=subject['subject'],
-                            subdepartament=Subdepartament.objects.get(code=subject['subDep'])).save()
+                    newRecord = Subject(name=subject['subject'],
+                            subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                    newRecord.save()
+                    newRecord.groups.add(group)
+                    newRecord.save()
             return True
         except Exception as err:
             return err
-        finally:
-            eu.exit()
 
     def updateStudentsInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
-        eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
-            eu.login()
-            listStudents = eu.getProgressInGroup(code, semester, False, True, False)
-
-            for student in listStudents['students']:
+            #добавить проверку на то, что студент может перевестись в другую группу и в этой его нужно удалить
+            newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
+            for student in newListStudents['students']:
                 find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
-                z = find.last_name
                 if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
                     lastGroup = Group.objects.get(students=find, semester__code=semester)
                     lastGroup.students.remove(find)
@@ -174,17 +156,16 @@ class updateData:
             return True
         except Exception as err:
             return err
-        finally:
-            eu.exit()
 
     def updateProgressInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            listProgress = self.eu.getProgressInGroup(code, semester, True, False, True)
+            listProgress = self.eu.getProgressInGroup(code, semester, False, False, True)
             subjects = []
+            #group.students.all().order_by('last_name', 'first_name', 'patronymic')
             for subject in listProgress['subjects']:
                 subjects.append(Subject.objects.get(name=subject['subject'],
-                                               subdepartament=Subdepartament.objects.get(code=subject['subDep'])))
+                                                    subdepartament=Subdepartament.objects.get(code=subject['subDep'])))
             for i, progress in enumerate(listProgress['progress']):
                 find = group.students.all()
 
@@ -200,7 +181,8 @@ class updateData:
         except Exception as err:
             return err
         finally:
-            pass#eu.exit()
+            pass
+            # eu.exit()
 
     def proveStudentInGroup(self, student, group, semester):
         gr = Group.objects.get(name=group, semester__id=semester)
