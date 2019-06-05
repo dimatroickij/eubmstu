@@ -84,7 +84,6 @@ class Group(models.Model):
 class Subject(models.Model):
     name = models.CharField('Название', max_length=200)
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
-    groups = models.ManyToManyField(Group, verbose_name='Группы')
 
     def __str__(self):
         return self.name
@@ -95,8 +94,21 @@ class Subject(models.Model):
         unique_together = [['name', 'subdepartament']]
 
 
-class Progress(models.Model):
+class GroupSubject(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name='Группа')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
+
+    def __str__(self):
+        return self.group.name + ' - ' + self.subject.name
+
+    class Meta:
+        verbose_name = 'группаПредмет'
+        verbose_name_plural = 'ГруппыПредметы'
+        unique_together = [['group', 'subject']]
+
+
+class Progress(models.Model):
+    subject = models.ForeignKey(GroupSubject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
     point = models.IntegerField('Количество баллов за предмет')
 

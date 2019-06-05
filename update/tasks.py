@@ -1,7 +1,7 @@
 from psycopg2._psycopg import OperationalError
 
 from control.getDataEU import getDataEU
-from control.models import Semester, Departament, Subdepartament, Group, Student, Subject, Progress
+from control.models import Semester, Departament, Subdepartament, Group, Student, Subject, Progress, GroupSubject
 from eubmstu.exceptions import EmptyListDeps, EmptyListSubDeps, EmptyListGroups, SubDepsNotFound
 from eubmstu.settings import USERNAME, PASSWORD
 
@@ -130,14 +130,22 @@ class updateData:
                 try:
                     find = Subject.objects.get(name=subject['subject'],
                                                subdepartament=Subdepartament.objects.get(code=subject['subDep']))
-                    find.groups.add(group)
-                    find.save()
+                    try:
+                        gs = GroupSubject.objects.get(group=group, subject=find).group
+                    except GroupSubject.DoesNotExist:
+                        GroupSubject(group=group, subject=find).save()
+                    # find.groups.add(group)
+                    # find.save()
                 except Subject.DoesNotExist:
                     newRecord = Subject(name=subject['subject'],
                                         subdepartament=Subdepartament.objects.get(code=subject['subDep']))
                     newRecord.save()
-                    newRecord.groups.add(group)
-                    newRecord.save()
+                    try:
+                        find = GroupSubject.objects.get(group=group, subject=newRecord).group
+                    except GroupSubject.DoesNotExist:
+                        GroupSubject.objects.get(group=group, subject=newRecord).save()
+                    # newRecord.groups.add(group)
+                    # newRecord.save()
             return True
         except Exception as err:
             return err
