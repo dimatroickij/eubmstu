@@ -55,7 +55,6 @@ class SemesterAdmin(admin.ModelAdmin):
 
 @admin.register(Progress)
 class ProgressAdmin(admin.ModelAdmin):
-    search_fields = ['subject', 'student']
     list_display = ('student', 'subject', 'point')
     list_per_page = 10
 
