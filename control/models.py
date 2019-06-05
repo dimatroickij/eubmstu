@@ -112,7 +112,11 @@ class Progress(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
     point = models.IntegerField('Количество баллов за предмет')
 
+    def __str__(self):
+        return self.subject.subject.name + ' - ' + self.student.last_name
+
     class Meta:
+        ordering = ['student']
         unique_together = [['subject', 'student']]
         verbose_name = 'Текущая успеваемость'
         verbose_name_plural = 'Текущая успеваемость'

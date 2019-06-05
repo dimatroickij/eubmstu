@@ -280,7 +280,7 @@ class getDataEU:
             for j in range(4, 4 + count):
                 thead = self.driver.find_element(By.XPATH,
                                                  "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j)
-                row = self.formatProgress(thead.text.split('\n')[-1], thead.get_attribute('title'), i, j)
+                row = self.formatProgress((thead.text.split('\n')[-1]).strip(), thead.get_attribute('title').strip(), i, j)
                 if row != []:
                     progress.append(row)
             if len(progress) != count:
@@ -289,7 +289,7 @@ class getDataEU:
                 j = lenThead - 3
                 subject = self.driver.find_element(By.XPATH,
                                                    "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j)
-                row = self.formatProgress(subject.text.split('\n')[-1], subject.get_attribute('title'), i, j)
+                row = self.formatProgress((subject.text.split('\n')[-1]).strip(), subject.get_attribute('title').strip(), i, j)
                 if row != []:
                     progress.append(row)
             return progress
