@@ -1,0 +1,45 @@
+{% extends 'application.html' %}
+{% block title %}Отчёт{% endblock %}
+{% block contentSite %}
+    <div class="container">
+
+        <div class="report">
+            <div class="card mb-2">
+                <div class="card-body"
+                     style="display: flex; align-items: flex-start;justify-content: space-between">
+                    <h6>Отчёт {{ i }}</h6>
+                    <small class="text-muted">25.05.2019 12:12:12</small>
+                    <div>
+                        <i class="material-icons">save</i>
+                        <i class="material-icons">clear</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h3 class="text-center">{{ group }}
+            <small class="text-muted">{{ semester }}</small>
+        </h3>
+        <table class="table table-hover table-sm">
+            <thead>
+            <tr>
+                <th scope="col">ФИО</th>
+                <th scope="col">З. К.</th>
+                {% for subject in subjects %}
+                    <th scope="col">{{ subject.subject }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for report in reports %}
+                <tr>
+                    <td>{{ report.student.last_name }}</td>
+                    <td>{{ report.student.gradebook }}</td>
+                    {% for cell in report.progress %}
+                        <td>{{ cell.point }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
