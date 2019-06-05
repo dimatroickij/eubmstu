@@ -168,7 +168,6 @@ class updateData:
                                                     subdepartament=Subdepartament.objects.get(code=subject['subDep'])))
             for i, progress in enumerate(listProgress['progress']):
                 find = group.students.all()
-
                 try:
                     record = Progress.objects.get(subject=subjects[i], student=find[i],
                                                   semester=Semester.objects.get(code=semester))
@@ -180,9 +179,6 @@ class updateData:
             return True
         except Exception as err:
             return err
-        finally:
-            pass
-            # eu.exit()
 
     def proveStudentInGroup(self, student, group, semester):
         gr = Group.objects.get(name=group, semester__id=semester)

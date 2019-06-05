@@ -238,14 +238,33 @@ class getDataEU:
     def getProgress(self, i, count):
         progress = []
         for j in range(4, 4 + count):
-            progress.append(
-                {'subject': self.driver.find_element(By.XPATH,
-                                                     "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j).get_attribute(
-                    'title'),
+            thead = self.driver.find_element(By.XPATH,
+                                             "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j)
+            row = self.formatProgress(thead.text.split('\n')[-1], thead.get_attribute('title'), i, j)
+            if row != []:
+                progress.append(row)
+        if len(progress) != count:
+            lenThead = len(self.driver.find_elements(By.XPATH,
+                                                     "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th"))
+            j = lenThead - 3
+            subject = self.driver.find_element(By.XPATH,
+                                               "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j)
+            row = self.formatProgress(subject.text.split('\n')[-1], subject.get_attribute('title'), i, j)
+            if row != []:
+                progress.append(row)
+        return progress
+
+    # Формирование строки текущей успеваемости
+    # subject - Название предмета
+    # i, j - переменные
+    def formatProgress(self, cell, subject, i, j):
+        if (cell != 'КМ' and cell != 'СЗ' and cell != 'ЛР'):
+            return {'subject': subject,
                     'point': self.driver.find_element(By.XPATH,
                                                       "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[%s]" % (
-                                                          i, j)).text})
-        return progress
+                                                          i, j)).text}
+        else:
+            return []
 
     # Количество предметов у данной группы
     def getCountSubjectsInGroup(self):
