@@ -1,18 +1,18 @@
 from psycopg2._psycopg import OperationalError
 
-from control.getDataEU import getDataEU
+from control.GetDataEU import GetDataEU
 from control.models import Semester, Departament, Subdepartament, Group, Student, Subject, Progress, GroupSubject
 from eubmstu.exceptions import EmptyListDeps, EmptyListSubDeps, EmptyListGroups, SubDepsNotFound
 from eubmstu.settings import USERNAME, PASSWORD
 
 
-class updateData:
+class UpdateData:
 
     def __init__(self):
-        self.eu = getDataEU(USERNAME, PASSWORD, False, True)
+        self.eu = GetDataEU(USERNAME, PASSWORD, False, True)
         self.eu.login()
 
-    def updateSemester(self):
+    def updateSemesters(self):
         try:
             semesters = self.eu.getSemesters()
             for semester in semesters:
@@ -24,7 +24,7 @@ class updateData:
         except Exception as err:
             return err
 
-    def updateDepartament(self):
+    def updateDepartaments(self):
         try:
             departaments = self.eu.getDepartaments()
             for departament in departaments:
@@ -39,7 +39,7 @@ class updateData:
         except Exception as err:
             return err
 
-    def updateSubdepartament(self):
+    def updateSubDepartaments(self):
         # eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
             departaments = Departament.objects.exclude(code='АДМИН').order_by('code')
@@ -56,7 +56,7 @@ class updateData:
         except Exception as err:
             return err
 
-    def updateGroup(self, sems):
+    def updateGroups(self, sems):
         try:
             semesters = Semester.objects.filter(pk__in=sems)
             for semester in semesters:
@@ -97,7 +97,7 @@ class updateData:
         except Exception as err:
             return err
 
-    def updateStudent(self, listDep):
+    def updateStudents(self, listDep):
         try:
             listLinkDeps = self.eu.getLinkDeps()
             for number in listDep:

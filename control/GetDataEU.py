@@ -9,7 +9,7 @@ from eubmstu.exceptions import EmptyListSubDeps, EmptyListDeps, EmptyListGroups,
 from eubmstu.settings import BASE_DIR
 
 
-class getDataEU:
+class GetDataEU:
 
     # Инициализация класса
     # username, password - логин и пароль для входа в ЕУ
@@ -25,8 +25,8 @@ class getDataEU:
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver.exe'), 0, self.options)
         self.username = username
         self.password = password
-        self.teacher = teacher
-        self.vpn = vpn
+        self.isTeacher = teacher
+        self.isVPN = vpn
         if vpn:
             self.linkProgress = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/progress3/'
             self.linkSession = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/session/'
@@ -40,7 +40,7 @@ class getDataEU:
     # Авторизация на сайте
     def login(self):
         try:
-            if self.vpn:
+            if self.isVPN:
                 self.driver.get("https://webvpn.bmstu.ru/+CSCOE+/logon.html")
                 self.driver.find_element(By.NAME, 'username').send_keys(self.username)
                 self.driver.find_element(By.NAME, 'password').send_keys(self.password)
@@ -49,7 +49,7 @@ class getDataEU:
                     "parent.doURL('75676763663A2F2F72682E6F7A6667682E6568',[{ 'l' : '4829322D03D1606FB09AE9AF59A271D3', 'n' : 1}],'get',false,'no', false)")
             else:
                 self.driver.get("http://eu.bmstu.ru")
-            if self.teacher:
+            if self.isTeacher:
                 self.driver.get(
                     self.driver.find_element(By.XPATH, "/html[1]/body[1]/div[1]/div[1]/a[2]").get_attribute(
                         'href'))
