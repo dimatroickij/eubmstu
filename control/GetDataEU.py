@@ -15,7 +15,7 @@ class GetDataEU:
     # username, password - логин и пароль для входа в ЕУ
     # teacher - является ли пользователь преподавателем
     # vpn - из какой сети происходит вход: из внутренней или внешней
-    def __init__(self, username, password, teacher, vpn):
+    def __init__(self, username, password, isTeacher, isVPN):
         self.options = webdriver.ChromeOptions()
         if platform.system() == 'Linux':
             display = Display(visible=0, size=(1920, 1080))
@@ -25,9 +25,9 @@ class GetDataEU:
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver.exe'), 0, self.options)
         self.username = username
         self.password = password
-        self.isTeacher = teacher
-        self.isVPN = vpn
-        if vpn:
+        self.isTeacher = isTeacher
+        self.isVPN = isVPN
+        if isVPN:
             self.linkProgress = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/progress3/'
             self.linkSession = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/session/'
             self.contingent = 'https://webvpn.bmstu.ru/+CSCO+1h75676763663A2F2F72682E6F7A6667682E6568++/modules/contingent3/'
@@ -280,7 +280,8 @@ class GetDataEU:
             for j in range(4, 4 + count):
                 thead = self.driver.find_element(By.XPATH,
                                                  "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j)
-                row = self.formatProgress((thead.text.split('\n')[-1]).strip(), thead.get_attribute('title').strip(), i, j)
+                row = self.formatProgress((thead.text.split('\n')[-1]).strip(), thead.get_attribute('title').strip(), i,
+                                          j)
                 if row != []:
                     progress.append(row)
             if len(progress) != count:
@@ -289,7 +290,8 @@ class GetDataEU:
                 j = lenThead - 3
                 subject = self.driver.find_element(By.XPATH,
                                                    "//table[@class='standart_table progress_students vertical_hover table-group']//thead/tr/th[%s]" % j)
-                row = self.formatProgress((subject.text.split('\n')[-1]).strip(), subject.get_attribute('title').strip(), i, j)
+                row = self.formatProgress((subject.text.split('\n')[-1]).strip(),
+                                          subject.get_attribute('title').strip(), i, j)
                 if row != []:
                     progress.append(row)
             return progress
@@ -334,8 +336,7 @@ class GetDataEU:
     # Получение текущей успеваемости группы по студентам и получение предметов у группы (работа функции по флагам)
     # group - код группы
     # semester - код семестра
-    # fSubjects, fStudents, fProgress - флаги, показывающие, какие данные нужны)
-    def getProgressInGroup(self, group, semester, fSubjects, fStudents, fProgress):
+    def getProgressInGroup(self, group, semester, fSubjects, fStudents, fSession):
         try:
             link = self.linkProgress + semester + '/group/' + group + '/'
             if self.driver.current_url != link:
@@ -350,9 +351,40 @@ class GetDataEU:
             for i in range(1, countStudents + 1):
                 if fStudents:
                     students.append(self.getStudentsInGroup(i))
-                if fProgress:
+                if fSession:
                     progress.append(self.getProgress(i, countSubjects))
             return {'subjects': subjects, 'students': students, 'progress': progress}
+        except Exception as e:
+            print(str(e))
+            return []
+
+    # Получение результатов сдачи сессии группой по студентам и получение предметов у группы (работа функции по флагам)
+    # group - код группы
+    # semester - код семестра
+    # fSubjects, fStudents, fProgress - флаги, показывающие, какие данные нужны)
+    def getSessionInGroup(self, group, semester):
+        try:
+            link = '%s?session_id=%s' % (self.linkSession, semester)
+            self.driver.get(link)
+            link = '%s/group/%s/' % (self.linkSession, group)
+            self.driver.get(link)
+            sessions = []
+            subjects = []
+            count = len(self.driver.find_elements(By.XPATH, '//thead/tr/th'))
+            for j in range(4, count + 1):
+                subjects.append(
+                    {'subject': self.driver.find_element(By.XPATH, '//thead/tr[1]/th[%s]/div[1]' % j).text,
+                     'type_rating': self.driver.find_element(By.XPATH, '//thead/tr[1]/th[%s]/div[2]/i' % j).text}
+                )
+            for i, student in enumerate(self.driver.find_elements(By.XPATH, '//tbody/tr')):
+                listStudent = {'gradeBook': self.driver.find_element(By.XPATH, '//tbody/tr[%s]/td[3]' % (i + 1)).text,
+                               'session': []}
+                for j in range(4, count + 1):
+                    listStudent['session'].append(
+                        {'numSubject': j - 4,
+                         'rating': self.driver.find_element(By.XPATH, '//tbody/tr[%s]/td[%s]' % (i + 1, j)).text})
+                sessions.append(listStudent)
+            return {'subjects': subjects, 'sessions': sessions}
         except Exception as e:
             print(str(e))
             return []
@@ -366,21 +398,3 @@ class GetDataEU:
             self.driver.quit()
             self.driver = None
         return True
-
-    # СЕССИЯ
-    # for i, line in enumerate(self.driver.find_elements(By.XPATH,
-    #                                                                "//table[@class='eu-table sortable-table']//thead/tr/th")):
-    #                 listLine.append(line.text)
-    #             listData.append(listLine)
-    #
-    #             for i, line in enumerate(self.driver.find_elements(By.XPATH,
-    #                                                                "//table[@class='eu-table sortable-table']//tbody/tr")):
-    #                 listLine = []
-    #                 for line in self.driver.find_elements(By.XPATH,
-    #                                                       "//table[@class='eu-table sortable-table']//tbody/tr[%d]/td" % (
-    #                                                               i + 1)):
-    #                     listLine.append(line.text)
-    #                 listLine[1] = self.driver.find_element(By.XPATH,
-    #                                                        "//table[@class='eu-table sortable-table']//tbody/tr[%d]/td[2]/div/span" % (
-    #                                                                i + 1)).text
-    #                 listData.append(listLine)
