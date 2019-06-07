@@ -75,27 +75,14 @@ class GetDataEU:
             listTerm = []
             self.driver.get(self.linkProgress)
             for term in self.driver.find_elements(By.XPATH, "//ul[@display='none']/li/a"):
-                listTerm.append({'name': term.get_attribute('text'), 'link': term.get_attribute('href').split('/')[-2],
-                                 'session': False})
+                listTerm.append({'name': term.get_attribute('text'), 'link': term.get_attribute('href').split('/')[-2]})
             code = listTerm[-1]['link']
             if code[-1] == '1':
                 code = code[0:-1] + '2'
             else:
                 code = str(int(code[0:4]) + 1) + '-01'
             listTerm.append(
-                {'name': self.driver.find_element(By.XPATH, "//span[@class='false-link']").text, 'link': code,
-                 'session': False})
-            self.driver.get(self.linkSession)
-            self.linkSession = self.driver.current_url
-            for term in self.driver.find_elements(By.XPATH, "//ul[@id='term-select']/li/a"):
-                link = term.get_attribute('href').split('/')[-1]
-                listTerm.append(
-                    {'name': term.get_attribute('text'), 'link': link, 'session': True})
-            code = listTerm[-1]['link']
-            code = code[0:12] + str(int(code[12:]) + 1)
-            listTerm.append(
-                {'name': self.driver.find_element(By.XPATH, "//span[@class='false-link']").text, 'link': code,
-                 'session': True})
+                {'name': self.driver.find_element(By.XPATH, "//span[@class='false-link']").text, 'link': code})
             return listTerm
         except Exception as e:
             print(str(e))
@@ -336,7 +323,8 @@ class GetDataEU:
     # Получение текущей успеваемости группы по студентам и получение предметов у группы (работа функции по флагам)
     # group - код группы
     # semester - код семестра
-    def getProgressInGroup(self, group, semester, fSubjects, fStudents, fSession):
+    # fSubjects, fStudents, fProgress - флаги, показывающие, какие данные нужны)
+    def getProgressInGroup(self, group, semester, fSubjects, fStudents, fProgress):
         try:
             link = self.linkProgress + semester + '/group/' + group + '/'
             if self.driver.current_url != link:
@@ -351,7 +339,7 @@ class GetDataEU:
             for i in range(1, countStudents + 1):
                 if fStudents:
                     students.append(self.getStudentsInGroup(i))
-                if fSession:
+                if fProgress:
                     progress.append(self.getProgress(i, countSubjects))
             return {'subjects': subjects, 'students': students, 'progress': progress}
         except Exception as e:
@@ -361,7 +349,6 @@ class GetDataEU:
     # Получение результатов сдачи сессии группой по студентам и получение предметов у группы (работа функции по флагам)
     # group - код группы
     # semester - код семестра
-    # fSubjects, fStudents, fProgress - флаги, показывающие, какие данные нужны)
     def getSessionInGroup(self, group, semester):
         try:
             link = '%s?session_id=%s' % (self.linkSession, semester)

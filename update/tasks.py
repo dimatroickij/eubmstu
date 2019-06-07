@@ -19,7 +19,7 @@ class UpdateData:
                 try:
                     find = Semester.objects.get(name=semester['name']).name
                 except Semester.DoesNotExist:
-                    save = Semester(name=semester['name'], code=semester['link'], session=semester['session']).save()
+                    save = Semester(name=semester['name'], code=semester['link']).save()
             return True
         except Exception as err:
             return err
@@ -122,10 +122,10 @@ class UpdateData:
         except Exception as err:
             return err
 
-    def updateSubjectsInGroup(self, groupCode, session):
+    def updateSubjectsInGroup(self, groupCode, semester):
         group = Group.objects.get(code=groupCode)
         try:
-            listSubjects = self.eu.getProgressInGroup(groupCode, session, True, False, False)
+            listSubjects = self.eu.getProgressInGroup(groupCode, semester, True, False, False)
             for subject in listSubjects['subjects']:
                 try:
                     find = Subject.objects.get(name=subject['subject'],
@@ -182,6 +182,9 @@ class UpdateData:
             return True
         except Exception as err:
             return err
+
+    def updateSessionInGroup(self, code, semester):
+        pass
 
     def proveStudentInGroup(self, student, group, semester):
         gr = Group.objects.get(name=group, semester__id=semester)
