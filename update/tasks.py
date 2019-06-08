@@ -61,11 +61,12 @@ class UpdateData:
         except Exception as err:
             return err
 
+    # 8.47 - обновление весеннего семестра 2018-2019
     def updateGroups(self, sems):
         try:
             semesters = Semester.objects.filter(pk__in=sems)
             for semester in semesters:
-                print(semester.name)
+                #print(semester.name)
                 try:
                     subDeps = Subdepartament.objects.exclude(departament__code='АДМИН')
                     for subDep in subDeps:
