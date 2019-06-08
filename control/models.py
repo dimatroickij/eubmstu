@@ -1,6 +1,19 @@
 from django.db import models
 
 
+class Semester(models.Model):
+    name = models.CharField('Название', max_length=40, unique=True)
+    code = models.CharField('Код', max_length=20, blank=True, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'семестр'
+        verbose_name_plural = 'Семестры'
+        ordering = ['code']
+
+
 # Create your models here.
 class Departament(models.Model):
     code = models.CharField('Код факультета', max_length=5, unique=True)
@@ -41,22 +54,9 @@ class Student(models.Model):
         return self.last_name + ' ' + self.first_name + ' ' + self.patronymic
 
     class Meta:
-        ordering = ['gradebook']
+        ordering = ['last_name', 'first_name', 'patronymic']
         verbose_name = 'студента'
         verbose_name_plural = 'Студенты'
-
-
-class Semester(models.Model):
-    name = models.CharField('Название', max_length=40, unique=True)
-    code = models.CharField('Код', max_length=20, blank=True, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'семестр'
-        verbose_name_plural = 'Семестры'
-        ordering = ['code']
 
 
 class Group(models.Model):
@@ -139,12 +139,16 @@ class Session(models.Model):
                    ('НРС', 'НРС'),
                    )
 
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
+    subject = models.ForeignKey(GroupSubject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
     type_rating = models.CharField('Тип оценки', max_length=5, choices=TYPE_RATING)
     rating = models.CharField('Оценка', max_length=4, choices=RATING)
 
+    def __str__(self):
+        return self.subject.subject.name + ' - ' + self.student.last_name
+
     class Meta:
+        ordering = ['student']
         unique_together = [['subject', 'student', 'type_rating']]
         verbose_name = 'Результаты сессии'
         verbose_name_plural = 'Результаты сессии'

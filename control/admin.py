@@ -61,4 +61,6 @@ class ProgressAdmin(admin.ModelAdmin):
 
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('student', 'subject', 'type_rating', 'rating')
+    list_filter = ['type_rating', 'rating']
+    list_per_page = 10

@@ -2,7 +2,8 @@ from django.core.exceptions import ValidationError
 from psycopg2._psycopg import OperationalError
 
 from control.GetDataEU import GetDataEU
-from control.models import Semester, Departament, Subdepartament, Group, Student, Subject, Progress, GroupSubject
+from control.models import Semester, Departament, Subdepartament, Group, Student, Subject, Progress, GroupSubject, \
+    Session
 from eubmstu.exceptions import EmptyListDeps, EmptyListSubDeps, EmptyListGroups, SubDepsNotFound
 from eubmstu.settings import USERNAME, PASSWORD
 
@@ -18,9 +19,11 @@ class UpdateData:
             semesters = self.eu.getSemesters()
             for semester in semesters:
                 try:
-                    find = Semester.objects.get(name=semester['name']).name
-                except Semester.DoesNotExist:
-                    save = Semester(name=semester['name'], code=semester['link']).save()
+                    save = Semester(name=semester['name'], code=semester['link'])
+                    save.full_clean()
+                    save.save()
+                except ValidationError:
+                    pass
             return True
         except Exception as err:
             return err
@@ -184,6 +187,10 @@ class UpdateData:
         except Exception as err:
             return err
 
+    #1.24 минуты - 19 человек, 7 предметов
+    #57 секунд - 17 человек, 7 предметов
+    #1.05 - 20 человек, 7 предметов
+    #30 сек - 4 человека, 7 предметов
     def updateSessionInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
@@ -210,8 +217,21 @@ class UpdateData:
                                         'type_rating': subject['type_rating']})
             students = group.students.all()
             for session in response['sessions']:
-                for cell in session:
-                    pass
+                for cell in session['session']:
+                    record = Session(subject=listSubject[cell['numSubject']]['subject'],
+                                     student=students.get(gradebook=session['gradeBook']),
+                                     type_rating=listSubject[cell['numSubject']]['type_rating'],
+                                     rating=cell['rating'])
+                    try:
+                        record.full_clean()
+                        record.save()
+                    except ValidationError:
+                        record = Session.objects.get(subject=listSubject[cell['numSubject']]['subject'],
+                                student=students.get(gradebook=session['gradeBook']),
+                                type_rating=listSubject[cell['numSubject']]['type_rating'])
+                        record.rating = cell['rating']
+                        record.save()
+            return True
         except Exception as err:
             return err
 
