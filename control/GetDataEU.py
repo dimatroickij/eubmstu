@@ -360,16 +360,21 @@ class GetDataEU:
             count = len(self.driver.find_elements(By.XPATH, '//thead/tr/th'))
             for j in range(4, count + 1):
                 subjects.append(
-                    {'subject': self.driver.find_element(By.XPATH, '//thead/tr[1]/th[%s]/div[1]' % j).text,
-                     'type_rating': self.driver.find_element(By.XPATH, '//thead/tr[1]/th[%s]/div[2]/i' % j).text}
+                    {'subject': self.driver.find_element(By.XPATH, '//thead/tr[1]/th[%s]/div[1]' % j).text.strip(),
+                     'subDep': self.driver.find_element(By.XPATH,
+                                                        '//thead/tr[1]/th[%s]/div[2]' % j).text.split('\n')[0].strip(),
+                     'type_rating': self.driver.find_element(By.XPATH,
+                                                             '//thead/tr[1]/th[%s]/div[2]/i' % j).text.strip()}
                 )
             for i, student in enumerate(self.driver.find_elements(By.XPATH, '//tbody/tr')):
-                listStudent = {'gradeBook': self.driver.find_element(By.XPATH, '//tbody/tr[%s]/td[3]' % (i + 1)).text,
-                               'session': []}
+                listStudent = {
+                    'gradeBook': self.driver.find_element(By.XPATH, '//tbody/tr[%s]/td[3]' % (i + 1)).text.strip(),
+                    'session': []}
                 for j in range(4, count + 1):
                     listStudent['session'].append(
                         {'numSubject': j - 4,
-                         'rating': self.driver.find_element(By.XPATH, '//tbody/tr[%s]/td[%s]' % (i + 1, j)).text})
+                         'rating': self.driver.find_element(By.XPATH,
+                                                            '//tbody/tr[%s]/td[%s]' % (i + 1, j)).text.strip()})
                 sessions.append(listStudent)
             return {'subjects': subjects, 'sessions': sessions}
         except Exception as e:

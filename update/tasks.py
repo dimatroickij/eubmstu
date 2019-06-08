@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from psycopg2._psycopg import OperationalError
 
 from control.GetDataEU import GetDataEU
@@ -184,7 +185,35 @@ class UpdateData:
             return err
 
     def updateSessionInGroup(self, code, semester):
-        pass
+        group = Group.objects.get(code=code, semester__code=semester)
+        try:
+            response = self.eu.getSessionInGroup(code, group.semester.pk + 3)
+            listSubject = []
+            for subject in response['subjects']:
+                try:
+                    listSubject.append(
+                        {'subject': GroupSubject.objects.get(group=group, subject__name=subject['subject']),
+                         'type_rating': subject['type_rating']})
+                except GroupSubject.DoesNotExist:
+                    newSubject = Subject(name=subject['subject'],
+                                         subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                    try:
+                        newSubject.full_clean()
+                        newSubject.save()
+                    except ValidationError:
+                        newSubject = Subject.objects.get(name=subject['subject'],
+                                                         subdepartament=Subdepartament.objects.get(
+                                                             code=subject['subDep']))
+                    newGroupSubject = GroupSubject(subject=newSubject, group=group)
+                    newGroupSubject.save()
+                    listSubject.append({'subject': newGroupSubject,
+                                        'type_rating': subject['type_rating']})
+            students = group.students.all()
+            for session in response['sessions']:
+                for cell in session:
+                    pass
+        except Exception as err:
+            return err
 
     def proveStudentInGroup(self, student, group, semester):
         gr = Group.objects.get(name=group, semester__id=semester)
