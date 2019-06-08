@@ -73,26 +73,28 @@ class GetDataEU:
     def getSemesters(self):
         try:
             listTerm = []
-            self.driver.get(self.linkProgress)
+            if self.driver.current_url != self.linkProgress:
+                self.driver.get(self.linkProgress)
             for term in self.driver.find_elements(By.XPATH, "//ul[@display='none']/li/a"):
-                listTerm.append({'name': term.get_attribute('text'), 'link': term.get_attribute('href').split('/')[-2]})
+                listTerm.append({'name': term.get_attribute('text').strip(),
+                                 'link': term.get_attribute('href').split('/')[-2].strip()})
             code = listTerm[-1]['link']
             if code[-1] == '1':
                 code = code[0:-1] + '2'
             else:
                 code = str(int(code[0:4]) + 1) + '-01'
             listTerm.append(
-                {'name': self.driver.find_element(By.XPATH, "//span[@class='false-link']").text, 'link': code})
+                {'name': self.driver.find_element(By.XPATH, "//span[@class='false-link']").text.strip(), 'link': code})
             return listTerm
         except Exception as e:
-            print(str(e))
-            return []
+            return str(e)
 
     # Получение списка факультетов
     def getDepartaments(self):
         try:
             listDep = []
-            self.driver.get(self.linkProgress)
+            if self.driver.current_url != self.linkProgress:
+                self.driver.get(self.linkProgress)
             deps = self.driver.find_elements(By.XPATH, "//ul[@class='eu-tree-root']/li/span")
             if len(deps) == 0:
                 raise EmptyListDeps()
@@ -100,11 +102,10 @@ class GetDataEU:
                 for dep in deps:
                     if ['ИСОТ', 'ФО', 'ВИ'].count(dep.text.split(' - ')[0]) == 0:
                         listDep.append(
-                            {'name': dep.text.split(' - ')[1:], 'code': dep.text.split(' - ')[0]})
+                            {'name': dep.text.split(' - ')[1:].strip(), 'code': dep.text.split(' - ')[0].strip()})
                 return listDep
         except Exception as e:
-            print(str(e))
-            return []
+            return str(e)
 
     # Получение списка кафедр
     # dep - код факультета
@@ -122,39 +123,35 @@ class GetDataEU:
                 else:
                     for subDep in subDeps:
                         text = subDep.get_attribute("innerHTML").replace('&nbsp;', ' ')
-                        listSubDep.append({'name': text.split(' - ')[1], 'code': text.split(' - ')[0]})
+                        listSubDep.append({'name': text.split(' - ')[1].strip(), 'code': text.split(' - ')[0].strip()})
             except DepsNotFound:
                 pass
             finally:
                 return listSubDep
         except Exception as e:
             print(str(e))
-            return []
+            raise Exception('Ошибка получения списка кафедр факультета %s' % dep)
 
     # Получение списка групп
     # dep - код факультета
     # subDep - код кафедры
     # semester - код семестра
     def getGroups(self, dep, subDep, semester):
-        try:
-            link = self.linkProgress + semester + '/'
-            if self.driver.current_url != link:
-                self.driver.get(link)
-            listGroup = []
-            groups = self.driver.find_elements(By.XPATH,
-                                               "//ul[@class='eu-tree-root']/li[%s]/ul/li[%s]/ul/li/a" % (
-                                                   self.searchDep(dep), self.searchSubDep(dep, subDep)))
-            if len(groups) == 0:
-                raise EmptyListGroups()
-            else:
-                for group in groups:
-                    listGroup.append(
-                        {'name': group.get_attribute('text'), 'code': group.get_attribute('href').split('/')[-2],
-                         'levelEducation': group.get_attribute('data-stage'), 'isEmpty': group.get_attribute('class')})
-                return listGroup
-        except Exception as e:
-            print(str(e))
-            return []
+        link = self.linkProgress + semester + '/'
+        if self.driver.current_url != link:
+            self.driver.get(link)
+        listGroup = []
+        groups = self.driver.find_elements(By.XPATH,
+                                           "//ul[@class='eu-tree-root']/li[%s]/ul/li[%s]/ul/li/a" % (
+                                               self.searchDep(dep), self.searchSubDep(dep, subDep)))
+        if len(groups) == 0:
+            raise EmptyListGroups()
+        else:
+            for group in groups:
+                listGroup.append(
+                    {'name': group.get_attribute('text'), 'code': group.get_attribute('href').split('/')[-2],
+                     'levelEducation': group.get_attribute('data-stage'), 'isEmpty': group.get_attribute('class')})
+            return listGroup
 
     # Поиск факультета на странице по коду факультета
     def searchDep(self, code):

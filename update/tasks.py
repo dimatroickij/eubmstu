@@ -14,6 +14,7 @@ class UpdateData:
         self.eu = GetDataEU(USERNAME, PASSWORD, False, True)
         self.eu.login()
 
+    # 7 секунд
     def updateSemesters(self):
         try:
             semesters = self.eu.getSemesters()
@@ -28,34 +29,34 @@ class UpdateData:
         except Exception as err:
             return err
 
+    # 9 секунд
     def updateDepartaments(self):
         try:
             departaments = self.eu.getDepartaments()
             for departament in departaments:
                 try:
-                    find = Departament.objects.get(code=departament['code']).code
-                except Departament.DoesNotExist:
-                    save = Departament(name=departament['name'], code=departament['code'],
-                                       number=departament['number']).save()
-                print(departament)
-            self.eu.exit()
+                    save = Departament(name=departament['name'], code=departament['code'])
+                    save.full_clean()
+                    save.save()
+                except ValidationError:
+                    pass
             return True
         except Exception as err:
             return err
 
+    # 38 секунд
     def updateSubDepartaments(self):
-        # eu = getDataEU(USERNAME, PASSWORD, False, True)
         try:
             departaments = Departament.objects.exclude(code='АДМИН').order_by('code')
             for dep in departaments:
-                subDeps = eu.getSubDepartaments(dep.code)
+                subDeps = self.eu.getSubDepartaments(dep.code)
                 for subDep in subDeps:
                     try:
-                        find = Subdepartament.objects.get(code=subDep['code']).code
-                    except Subdepartament.DoesNotExist:
-                        save = Subdepartament(name=subDep['name'], code=subDep['code'],
-                                              number=subDep['number'], departament=dep).save()
-            # eu.exit()
+                        save = Subdepartament(name=subDep['name'], code=subDep['code'], departament=dep)
+                        save.full_clean()
+                        save.save()
+                    except ValidationError:
+                        pass
             return True
         except Exception as err:
             return err
@@ -69,26 +70,20 @@ class UpdateData:
                     subDeps = Subdepartament.objects.exclude(departament__code='АДМИН')
                     for subDep in subDeps:
                         try:
-                            # print(subDep.code)
-                            groups = eu.getGroups(subDep.departament.code, subDep.code, semester.code)
-                            # print(groups)
+                            groups = self.eu.getGroups(subDep.departament.code, subDep.code, semester.code)
                             for group in groups:
-                                # pass
+                                if group['isEmpty'] == '':
+                                    isEmpty = False
+                                else:
+                                    isEmpty = True
+                                record = Group(name=group['name'], code=group['code'], semester=semester,
+                                               subdepartament=subDep,
+                                               levelEducation=group['levelEducation'], isEmpty=isEmpty)
                                 try:
-                                    if group['isEmpty'] == '':
-                                        isEmpty = False
-                                    else:
-                                        isEmpty = True
-                                    find = Group.objects.get(code=group['code'], semester=semester,
-                                                             name=group['name']).code
-                                except Group.DoesNotExist:
-                                    if group['isEmpty'] == '':
-                                        isEmpty = False
-                                    else:
-                                        isEmpty = True
-                                    Group(name=group['name'], code=group['code'], semester=semester,
-                                          subdepartament=subDep,
-                                          levelEducation=group['levelEducation'], isEmpty=isEmpty).save()
+                                    record.full_clean()
+                                    record.save()
+                                except ValidationError:
+                                    pass
                         except SubDepsNotFound:
                             pass
                         except EmptyListSubDeps:
@@ -110,7 +105,6 @@ class UpdateData:
                 for num in range(1, count + 1):
                     print(str(num) + '/' + str(count))
                     student = self.eu.getStudentDep(listLinkDeps[number]['link'], num)
-                    # print(student)
                     try:
                         find = Student.objects.get(gradebook=student['gradebook'])
                         z = find.gradebook
@@ -178,19 +172,21 @@ class UpdateData:
                 for cell in progress:
                     subject = GroupSubject.objects.filter(group=group).get(subject__name=cell['subject'])
                     try:
+                        record = Progress(subject=subject, student=students[i], point=cell['point'])
+                        record.full_clean()
+                        record.save()
+                    except ValidationError:
                         record = Progress.objects.get(subject=subject, student=students[i])
                         record.point = cell['point']
                         record.save()
-                    except Progress.DoesNotExist:
-                        Progress(subject=subject, student=students[i], point=cell['point']).save()
             return True
         except Exception as err:
             return err
 
-    #1.24 минуты - 19 человек, 7 предметов
-    #57 секунд - 17 человек, 7 предметов
-    #1.05 - 20 человек, 7 предметов
-    #30 сек - 4 человека, 7 предметов
+    # 1.24 минуты - 19 человек, 7 предметов
+    # 57 секунд - 17 человек, 7 предметов
+    # 1.05 - 20 человек, 7 предметов
+    # 30 сек - 4 человека, 7 предметов
     def updateSessionInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
@@ -227,8 +223,8 @@ class UpdateData:
                         record.save()
                     except ValidationError:
                         record = Session.objects.get(subject=listSubject[cell['numSubject']]['subject'],
-                                student=students.get(gradebook=session['gradeBook']),
-                                type_rating=listSubject[cell['numSubject']]['type_rating'])
+                                                     student=students.get(gradebook=session['gradeBook']),
+                                                     type_rating=listSubject[cell['numSubject']]['type_rating'])
                         record.rating = cell['rating']
                         record.save()
             return True
