@@ -61,12 +61,12 @@ class UpdateData:
         except Exception as err:
             return err
 
-    # 8.47 - обновление весеннего семестра 2018-2019
+    # 8.47 минут - обновление весеннего семестра 2018-2019
     def updateGroups(self, sems):
         try:
             semesters = Semester.objects.filter(pk__in=sems)
             for semester in semesters:
-                #print(semester.name)
+                # print(semester.name)
                 try:
                     subDeps = Subdepartament.objects.exclude(departament__code='АДМИН')
                     for subDep in subDeps:
@@ -127,24 +127,18 @@ class UpdateData:
             listSubjects = self.eu.getProgressInGroup(groupCode, semester, True, False, False)
             for subject in listSubjects['subjects']:
                 try:
-                    find = Subject.objects.get(name=subject['subject'],
+                    recordSubject = Subject.objects.get(name=subject['subject'],
                                                subdepartament=Subdepartament.objects.get(code=subject['subDep']))
-                    try:
-                        GroupSubject.objects.get(group=group, subject=find).group
-                    except GroupSubject.DoesNotExist:
-                        GroupSubject(group=group, subject=find).save()
-                    # find.groups.add(group)
-                    # find.save()
                 except Subject.DoesNotExist:
-                    newRecord = Subject(name=subject['subject'],
+                    recordSubject = Subject(name=subject['subject'],
                                         subdepartament=Subdepartament.objects.get(code=subject['subDep']))
-                    newRecord.save()
-                    try:
-                        GroupSubject.objects.get(group=group, subject=newRecord).group
-                    except GroupSubject.DoesNotExist:
-                        GroupSubject(group=group, subject=newRecord).save()
-                    # newRecord.groups.add(group)
-                    # newRecord.save()
+                    recordSubject.save()
+                try:
+                    record = GroupSubject(group=group, subject=recordSubject)
+                    record.full_clean()
+                    record.save()
+                except ValidationError:
+                    pass
             return True
         except Exception as err:
             return err
@@ -152,7 +146,7 @@ class UpdateData:
     def updateStudentsInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            # добавить проверку на то, что студент может перевестись в другую группу и в этой его нужно удалить
+            oldStudents = list(group.students.all().values('gradebook', 'last_name'))
             newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
             for student in newListStudents['students']:
                 find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
@@ -160,6 +154,13 @@ class UpdateData:
                     lastGroup = Group.objects.get(students=find, semester__code=semester)
                     lastGroup.students.remove(find)
                 group.students.add(find)
+                try:
+                    oldStudents.remove({'gradebook': student['gradebok']})
+                except ValueError:
+                    pass
+                if len(oldStudents) != 0:
+                    for old in oldStudents:
+                        group.students.remove(Student.objects.get(gradebook=old['gradeBook']))
             return True
         except Exception as err:
             return err
