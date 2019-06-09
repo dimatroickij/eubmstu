@@ -155,12 +155,12 @@ class UpdateData:
                     lastGroup.students.remove(find)
                 group.students.add(find)
                 try:
-                    oldStudents.remove({'gradebook': student['gradebok']})
+                    oldStudents.remove({'gradebook': student['gradeBook']})
                 except ValueError:
                     pass
                 if len(oldStudents) != 0:
                     for old in oldStudents:
-                        group.students.remove(Student.objects.get(gradebook=old['gradeBook']))
+                        group.students.remove(Student.objects.get(gradebook=old['gradebook']))
             return True
         except Exception as err:
             return err
