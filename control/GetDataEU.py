@@ -213,15 +213,13 @@ class GetDataEU:
         try:
             if self.driver.current_url != link:
                 self.driver.get(link)
-            student = {'name': self.driver.find_element(By.XPATH,
-                                                        "//table[@class='students-table']//tbody/tr[%s]/td[2]" % (
-                                                            number)).text,
+            student = {'name': re.sub(r'\s+', ' ', self.driver.find_element(By.XPATH,
+                                                                            "//table[@class='students-table']//tbody/tr[%s]/td[2]" % (
+                                                                                number)).text).strip(),
                        'gradebook': self.driver.find_element(By.XPATH,
                                                              "//table[@class='students-table']//tbody/tr[%s]/td[3]" % (
-                                                                 number)).text,
-                       'group': self.driver.find_element(By.XPATH,
-                                                         "//table[@class='students-table']//tbody/tr[%s]/td[4]" % (
-                                                             number)).text}
+                                                                 number)).text
+                       }
             return student
         except Exception as e:
             print(str(e))

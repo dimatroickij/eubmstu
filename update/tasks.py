@@ -97,27 +97,35 @@ class UpdateData:
         except Exception as err:
             return err
 
-    def updateStudents(self, listDep):
+    def updateStudents(self, listDep, errorList = None, errorNumber = None):
         try:
             listLinkDeps = self.eu.getLinkDeps()
             for number in listDep:
                 count = self.eu.getCountStudentsDep(listLinkDeps[number]['link'])
                 print(listLinkDeps[number]['dep'] + ' ' + str(count))
                 for num in range(1, count + 1):
-                    print(str(num) + '/' + str(count))
+                    if num % 100 == 0:
+                        print(str(num) + '/' + str(count))
                     student = self.eu.getStudentDep(listLinkDeps[number]['link'], num)
+                    name = student['name'].split(' ')
+                    if len(name) == 2:
+                        name.append('')
                     try:
-                        find = Student.objects.get(gradebook=student['gradebook'])
-                        z = find.gradebook
-                        # proveStudentInGroup(find, student['group'], Semester.objects.all().last().id)
-                    except Student.DoesNotExist:
-                        name = student['name'].split(' ')
-                        if len(name) == 2:
-                            name.append('')
                         stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
                                        gradebook=student['gradebook'])
-                        stud.save()
-                        # proveStudentInGroup(stud, student['group'], Semester.objects.all().last().id)
+                        try:
+                            stud.full_clean()
+                            stud.save()
+                        except ValidationError:
+                            pass
+                    except OperationalError:
+                        stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
+                                       gradebook=student['gradebook'])
+                        try:
+                            stud.full_clean()
+                            stud.save()
+                        except ValidationError:
+                            pass
         except Exception as err:
             return err
 
@@ -128,10 +136,11 @@ class UpdateData:
             for subject in listSubjects['subjects']:
                 try:
                     recordSubject = Subject.objects.get(name=subject['subject'],
-                                               subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                                                        subdepartament=Subdepartament.objects.get(
+                                                            code=subject['subDep']))
                 except Subject.DoesNotExist:
                     recordSubject = Subject(name=subject['subject'],
-                                        subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                                            subdepartament=Subdepartament.objects.get(code=subject['subDep']))
                     recordSubject.save()
                 try:
                     record = GroupSubject(group=group, subject=recordSubject)
