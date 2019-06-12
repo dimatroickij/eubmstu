@@ -97,7 +97,7 @@ class UpdateData:
         except Exception as err:
             return err
 
-    def updateStudents(self, listDep, errorList = None, errorNumber = None):
+    def updateStudents(self, listDep):
         try:
             listLinkDeps = self.eu.getLinkDeps()
             for number in listDep:
@@ -111,23 +111,23 @@ class UpdateData:
                     if len(name) == 2:
                         name.append('')
                     try:
-                        stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
-                                       gradebook=student['gradebook'])
-                        try:
-                            stud.full_clean()
-                            stud.save()
-                        except ValidationError:
-                            pass
+                        self.saveStudents(name, student)
                     except OperationalError:
-                        stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
-                                       gradebook=student['gradebook'])
-                        try:
-                            stud.full_clean()
-                            stud.save()
-                        except ValidationError:
-                            pass
+                        self.saveStudents(name, student)
         except Exception as err:
             return err
+
+    def saveStudents(self, name, student):
+        try:
+            stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
+                           gradebook=student['gradebook'])
+            try:
+                stud.full_clean()
+                stud.save()
+            except ValidationError:
+                pass
+        except OperationalError:
+            self.saveStudents(name, student)
 
     def updateSubjectsInGroup(self, groupCode, semester):
         group = Group.objects.get(code=groupCode)
@@ -241,8 +241,3 @@ class UpdateData:
             return True
         except Exception as err:
             return err
-
-    def proveStudentInGroup(self, student, group, semester):
-        gr = Group.objects.get(name=group, semester__id=semester)
-        gr.students.add(student)
-        gr.save()
