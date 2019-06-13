@@ -141,10 +141,11 @@ class UpdateData:
                 except Subdepartament.DoesNotExist:
                     try:
                         subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'],
-                                            departament=Departament.objects.get(
-                                                code=re.sub(r'\d+', '', subject['subDep'])))
+                                                departament=Departament.objects.get(
+                                                    code=re.sub(r'\d+', '', subject['subDep'])))
                     except Departament.DoesNotExist:
-                        dep = Departament(code=re.sub(r'\d+', '', subject['subDep']), name=re.sub(r'\d+', '', subject['subDep']))
+                        dep = Departament(code=re.sub(r'\d+', '', subject['subDep']),
+                                          name=re.sub(r'\d+', '', subject['subDep']))
                         dep.save()
                         subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'], departament=dep)
                     subDep.full_clean()
@@ -163,7 +164,7 @@ class UpdateData:
                 except ValidationError:
                     pass
             return True
-        except Exception as err:
+        except RuntimeError as err:
             return err
 
     def updateStudentsInGroup(self, code, semester):
@@ -172,20 +173,23 @@ class UpdateData:
             # oldStudents = list(group.students.all().values('gradebook', 'last_name'))
             newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
             for student in newListStudents['students']:
-                find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
-                if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
-                    lastGroup = Group.objects.get(students=find, semester__code=semester)
-                    lastGroup.students.remove(find)
-                group.students.add(find)
-                # try:
-                #     oldStudents.remove({'gradebook': student['gradeBook']})
-                # except ValueError:
-                #     pass
-                # if len(oldStudents) != 0:
-                #     for old in oldStudents:
-                #         group.students.remove(Student.objects.get(gradebook=old['gradebook']))
+                try:
+                    find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
+                    if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
+                        lastGroup = Group.objects.get(students=find, semester__code=semester)
+                        lastGroup.students.remove(find)
+                    group.students.add(find)
+                except Student.DoesNotExist:
+                    pass
+                    # try:
+                    #     oldStudents.remove({'gradebook': student['gradeBook']})
+                    # except ValueError:
+                    #     pass
+                    # if len(oldStudents) != 0:
+                    #     for old in oldStudents:
+                    #         group.students.remove(Student.objects.get(gradebook=old['gradebook']))
             return True
-        except Exception as err:
+        except RuntimeError as err:
             return err
 
     def updateProgressInGroup(self, code, semester):
@@ -204,8 +208,10 @@ class UpdateData:
                         record = Progress.objects.get(subject=subject, student=students[i])
                         record.point = cell['point']
                         record.save()
+                    except IndexError:
+                        print('no exist %s' % progress)
             return True
-        except Exception as err:
+        except RuntimeError as err:
             return err
 
     # 1.24 минуты - 19 человек, 7 предметов
