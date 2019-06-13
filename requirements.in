@@ -10,3 +10,4 @@ django-celery-results
 django-celery-beat
 selenium
 pyvirtualdisplay
+fcntl

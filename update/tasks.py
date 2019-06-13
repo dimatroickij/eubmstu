@@ -1,3 +1,5 @@
+import re
+
 from django.core.exceptions import ValidationError
 from psycopg2._psycopg import OperationalError
 
@@ -130,17 +132,29 @@ class UpdateData:
             self.saveStudents(name, student)
 
     def updateSubjectsInGroup(self, groupCode, semester):
-        group = Group.objects.get(code=groupCode)
+        group = Group.objects.get(code=groupCode, semester__code=semester)
         try:
             listSubjects = self.eu.getProgressInGroup(groupCode, semester, True, False, False)
             for subject in listSubjects['subjects']:
                 try:
-                    recordSubject = Subject.objects.get(name=subject['subject'],
-                                                        subdepartament=Subdepartament.objects.get(
-                                                            code=subject['subDep']))
+                    subDep = Subdepartament.objects.get(code=subject['subDep'])
+                except Subdepartament.DoesNotExist:
+                    try:
+                        subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'],
+                                            departament=Departament.objects.get(
+                                                code=re.sub(r'\d+', '', subject['subDep'])))
+                    except Departament.DoesNotExist:
+                        dep = Departament(code=re.sub(r'\d+', '', subject['subDep']), name=re.sub(r'\d+', '', subject['subDep']))
+                        dep.save()
+                        subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'], departament=dep)
+                    subDep.full_clean()
+                    subDep.save()
+                    recordSubject = Subject(name=subject['subject'], subdepartament=subDep)
+                    recordSubject.save()
+                try:
+                    recordSubject = Subject.objects.get(name=subject['subject'], subdepartament=subDep)
                 except Subject.DoesNotExist:
-                    recordSubject = Subject(name=subject['subject'],
-                                            subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                    recordSubject = Subject(name=subject['subject'], subdepartament=subDep)
                     recordSubject.save()
                 try:
                     record = GroupSubject(group=group, subject=recordSubject)
@@ -155,7 +169,7 @@ class UpdateData:
     def updateStudentsInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            oldStudents = list(group.students.all().values('gradebook', 'last_name'))
+            # oldStudents = list(group.students.all().values('gradebook', 'last_name'))
             newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
             for student in newListStudents['students']:
                 find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
@@ -163,13 +177,13 @@ class UpdateData:
                     lastGroup = Group.objects.get(students=find, semester__code=semester)
                     lastGroup.students.remove(find)
                 group.students.add(find)
-                try:
-                    oldStudents.remove({'gradebook': student['gradeBook']})
-                except ValueError:
-                    pass
-                if len(oldStudents) != 0:
-                    for old in oldStudents:
-                        group.students.remove(Student.objects.get(gradebook=old['gradebook']))
+                # try:
+                #     oldStudents.remove({'gradebook': student['gradeBook']})
+                # except ValueError:
+                #     pass
+                # if len(oldStudents) != 0:
+                #     for old in oldStudents:
+                #         group.students.remove(Student.objects.get(gradebook=old['gradebook']))
             return True
         except Exception as err:
             return err

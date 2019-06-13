@@ -2,7 +2,7 @@ import os
 import platform
 import re
 
-from pyvirtualdisplay import Display
+# from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -19,8 +19,8 @@ class GetDataEU:
     def __init__(self, username, password, isTeacher, isVPN):
         self.options = webdriver.ChromeOptions()
         if platform.system() == 'Linux':
-            display = Display(visible=0, size=(1920, 1080))
-            display.start()
+            # display = Display(visible=0, size=(1920, 1080))
+            # display.start()
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver'), 0, self.options)
         elif platform.system() == 'Windows':
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver.exe'), 0, self.options)

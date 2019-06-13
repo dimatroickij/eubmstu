@@ -12,8 +12,8 @@ def home(request):
 
 
 @login_required
-def show(request, code):
-    group = Group.objects.get(pk=28519)
+def show(request, group, code):
+    group = Group.objects.get(pk=group)
     students = group.students.all()
     if code == 1:
         reports = Progress.objects.filter(student__in=students, subject__group=group)

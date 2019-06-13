@@ -22,6 +22,7 @@
         <table class="table table-hover table-sm">
             <thead>
             <tr>
+                <th scope="col">№</th>
                 <th scope="col">ФИО</th>
                 <th scope="col">З. К.</th>
                 {% for subject in subjects %}
@@ -32,6 +33,7 @@
             <tbody>
             {% for report in reports %}
                 <tr>
+                    <th>1</th>
                     <td>{{ report.student.last_name }}</td>
                     <td>{{ report.student.gradebook }}</td>
                     {% for cell in report.progress %}
