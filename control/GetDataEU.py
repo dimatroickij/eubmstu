@@ -1,9 +1,6 @@
 import os
 import platform
 import re
-
-# from pyvirtualdisplay import Display
-from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -20,8 +17,15 @@ class GetDataEU:
     def __init__(self, username, password, isTeacher, isVPN):
         self.options = webdriver.ChromeOptions()
         if platform.system() == 'Linux':
-            display = Display(visible=0, size=(1920, 1080))
-            display.start()
+            # chrome_options = webdriver.ChromeOptions()
+            # chrome_options.add_argument('--headless')
+            # chrome_options.add_argument("--window-size=720,480")
+            # chrome_options.add_argument('--no-sandbox')
+            # driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=chrome_options,
+            #                           service_args=['--verbose', '--log-path=/tmp/chromedriver.log'])
+            from pyvirtualdisplay import Display
+            self.display = Display(visible=0, size=(1920, 1080))
+            self.display.start()
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver'), 0, self.options)
         elif platform.system() == 'Windows':
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver.exe'), 0, self.options)
@@ -378,6 +382,9 @@ class GetDataEU:
             print(str(e))
             return []
 
+    def scroll(self):
+        self.driver.execute_script("window.scrollTo(0, 10)")
+
     # выход из системы
     def exit(self):
         try:
@@ -387,3 +394,6 @@ class GetDataEU:
             self.driver.quit()
             self.driver = None
         return True
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.display.sendstop()

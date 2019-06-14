@@ -110,6 +110,8 @@ class UpdateData:
                 for num in range(start, count + 1):
                     if num % 100 == 0:
                         print(str(num) + '/' + str(count))
+                    if num % 1000 == 0:
+                        self.eu.scroll()
                     student = self.eu.getStudentDep(listLinkDeps[number]['link'], num)
                     name = student['name'].split(' ')
                     if len(name) == 2:
