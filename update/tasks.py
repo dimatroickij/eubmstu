@@ -99,13 +99,15 @@ class UpdateData:
         except Exception as err:
             return err
 
-    def updateStudents(self, listDep):
+    def updateStudents(self, listDep, start=None):
         try:
+            if start is None:
+                start = 1
             listLinkDeps = self.eu.getLinkDeps()
             for number in listDep:
                 count = self.eu.getCountStudentsDep(listLinkDeps[number]['link'])
                 print(listLinkDeps[number]['dep'] + ' ' + str(count))
-                for num in range(1, count + 1):
+                for num in range(start, count + 1):
                     if num % 100 == 0:
                         print(str(num) + '/' + str(count))
                     student = self.eu.getStudentDep(listLinkDeps[number]['link'], num)

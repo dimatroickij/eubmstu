@@ -18,9 +18,9 @@ django==2.2.2
 easyprocess==0.2.7        # via pyvirtualdisplay
 gunicorn==19.9.0
 idna==2.8                 # via requests
-kombu==4.6.1              # via celery
-psycopg2-binary==2.8.2
-psycopg2==2.8.2
+kombu==4.6.2              # via celery
+psycopg2-binary==2.8.3
+psycopg2==2.8.3
 python-crontab==2.3.6     # via django-celery-beat
 python-dateutil==2.8.0    # via python-crontab
 pytz==2019.1              # via celery, django, django-timezone-field
