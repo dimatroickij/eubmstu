@@ -390,10 +390,9 @@ class GetDataEU:
         try:
             self.driver.quit()
             self.driver = None
+            self.display.sendstop()
         except:
             self.driver.quit()
             self.driver = None
+            self.display.sendstop()
         return True
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.display.sendstop()
