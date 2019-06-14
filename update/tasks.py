@@ -113,17 +113,18 @@ class UpdateData:
                     if num % 1000 == 0:
                         self.eu.scroll()
                     student = self.eu.getStudentDep(listLinkDeps[number]['link'], num)
-                    name = student['name'].split(' ')
-                    if len(name) == 2:
-                        name.append('')
+
                     try:
-                        self.saveStudents(name, student)
+                        self.saveStudents(student)
                     except OperationalError:
-                        self.saveStudents(name, student)
+                        self.saveStudents(student)
         except Exception as err:
             return err
 
-    def saveStudents(self, name, student):
+    def saveStudents(self, student):
+        name = student['name'].split(' ')
+        if len(name) == 2:
+            name.append('')
         try:
             stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
                            gradebook=student['gradebook'])
@@ -133,7 +134,7 @@ class UpdateData:
             except ValidationError:
                 pass
         except OperationalError:
-            self.saveStudents(name, student)
+            self.saveStudents(student)
 
     def updateSubjectsInGroup(self, groupCode, semester):
         group = Group.objects.get(code=groupCode, semester__code=semester)
@@ -176,7 +177,7 @@ class UpdateData:
         try:
             # oldStudents = list(group.students.all().values('gradebook', 'last_name'))
             newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
-            for student in newListStudents['students']:
+            for i, student in enumerate(newListStudents['students']):
                 try:
                     find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
                     if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
@@ -184,7 +185,11 @@ class UpdateData:
                         lastGroup.students.remove(find)
                     group.students.add(find)
                 except Student.DoesNotExist:
-                    pass
+                    search = self.eu.searchStudents(i)
+                    name = student['name'].split(' ')
+                    if len(name) == 2:
+                        name.append('')
+                    self.saveStudents(search)
                     # try:
                     #     oldStudents.remove({'gradebook': student['gradeBook']})
                     # except ValueError:

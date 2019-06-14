@@ -260,6 +260,19 @@ class GetDataEU:
             print(str(e))
             return []
 
+    def searchStudents(self, i):
+        try:
+            student = self.driver.find_element(By.XPATH,
+                                               "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[2]//nobr/span[@class='fio_3']" % i + 1).text.split(
+                ' ')[0]
+            gradeBook = self.driver.find_element(By.XPATH,
+                                                 "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[3]" % i).text
+            return {'name': student,
+                    'gradebook': gradeBook}
+        except Exception as e:
+            print(str(e))
+            return []
+
     # Получение результатов текущей успеваемости группы
     # count - количество предметов у данной группы
     def getProgress(self, i, count):
