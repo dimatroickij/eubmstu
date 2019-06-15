@@ -366,10 +366,11 @@ class GetDataEU:
     # Получение результатов сдачи сессии группой по студентам и получение предметов у группы (работа функции по флагам)
     # group - код группы
     # semester - код семестра
-    def getSessionInGroup(self, group, semester):
+    def getSessionInGroup(self, group, semester, isMain):
         try:
-            link = '%s?session_id=%s' % (self.linkSession, semester)
-            self.driver.get(link)
+            if isMain:
+                link = '%s?session_id=%s' % (self.linkSession, semester)
+                self.driver.get(link)
             link = '%s/group/%s/' % (self.linkSession, group)
             self.driver.get(link)
             sessions = []

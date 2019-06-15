@@ -228,10 +228,10 @@ class UpdateData:
     # 57 секунд - 17 человек, 7 предметов
     # 1.05 - 20 человек, 7 предметов
     # 30 сек - 4 человека, 7 предметов
-    def updateSessionInGroup(self, code, semester):
+    def updateSessionInGroup(self, code, semester, isMain=True):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            response = self.eu.getSessionInGroup(code, group.semester.pk + 3)
+            response = self.eu.getSessionInGroup(code, group.semester.pk + 3, isMain)
             listSubject = []
             for subject in response['subjects']:
                 try:
@@ -261,13 +261,12 @@ class UpdateData:
                                      rating=cell['rating'])
                     try:
                         record.full_clean()
-                        record.save()
                     except ValidationError:
                         record = Session.objects.get(subject=listSubject[cell['numSubject']]['subject'],
                                                      student=students.get(gradebook=session['gradeBook']),
                                                      type_rating=listSubject[cell['numSubject']]['type_rating'])
                         record.rating = cell['rating']
-                        record.save()
+                    record.save()
             return True
-        except Exception as err:
+        except RuntimeError as err:
             return err

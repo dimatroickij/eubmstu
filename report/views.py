@@ -21,9 +21,10 @@ def show(request, group, code):
             reports = Progress.objects.filter(student__in=students, subject__group=group)
         else:
             reports = Session.objects.filter(student__in=students, subject__group=group)
-        subjects = sorted(list(map(lambda x: {'subject': GroupSubject.objects.get(pk=x['subject']).subject.name,
-                                              'subDep': GroupSubject.objects.get(pk=x['subject']).subject.subdepartament},
-                                   reports.filter(student=students[0]).values('subject'))), key=lambda x: x['subject'])
+        subjects = GroupSubject.objects.filter(group=group).order_by('subject__name')
+        # subjects = sorted(list(map(lambda x: {'subject': GroupSubject.objects.get(pk=x['subject']).subject.name,
+        #                                       'subDep': GroupSubject.objects.get(pk=x['subject']).subject.subdepartament},
+        #                            reports.filter(student=students[0]).values('subject'))), key=lambda x: x['subject'])
         if code == 1:
             for student in students:
                 mass.append({'student': student, 'progress': sorted(
