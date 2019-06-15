@@ -24,20 +24,20 @@
             <tr>
                 <th scope="col">№</th>
                 <th scope="col">ФИО</th>
-                <th scope="col">З. К.</th>
+                <th scope="col" class="text-center">З. К.</th>
                 {% for subject in subjects %}
-                    <th scope="col">{{ subject.subject }}</th>
+                    <th scope="col" class="text-center">{{ subject.subject }}</th>
                 {% endfor %}
             </tr>
             </thead>
             <tbody>
             {% for report in reports %}
                 <tr>
-                    <th>1</th>
+                    <th>{{ forloop.counter }}</th>
                     <td>{{ report.student.last_name }}</td>
-                    <td>{{ report.student.gradebook }}</td>
+                    <td class="text-center">{{ report.student.gradebook }}</td>
                     {% for cell in report.progress %}
-                        <td>{{ cell.point }}</td>
+                        <td class="text-center">{{ cell.point }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
