@@ -49,7 +49,7 @@ class UpdateData:
     # 38 секунд
     def updateSubDepartaments(self):
         try:
-            departaments = Departament.objects.exclude(code='АДМИН').order_by('code')
+            departaments = Departament.objects.exclude(code='АДМИН').exclude(code='ФВ').order_by('code')
             for dep in departaments:
                 subDeps = self.eu.getSubDepartaments(dep.code)
                 for subDep in subDeps:
@@ -70,7 +70,8 @@ class UpdateData:
             for semester in semesters:
                 # print(semester.name)
                 try:
-                    subDeps = Subdepartament.objects.exclude(departament__code='АДМИН')
+                    subDeps = Subdepartament.objects.exclude(departament__code='АДМИН').exclude(
+                        departament__code='ФВ').exclude(code='Л2')
                     for subDep in subDeps:
                         try:
                             groups = self.eu.getGroups(subDep.departament.code, subDep.code, semester.code)
@@ -270,3 +271,50 @@ class UpdateData:
             return True
         except RuntimeError as err:
             return err
+
+
+# Доделать
+def updateStudents(start=None, end=None):
+    ud = UpdateData()
+    if start is None:
+        start = 0
+    if end is None:
+        end = len(Departament.objects.all())
+    deps = range(start, end)
+    ud.updateStudents(deps)
+    ud.eu.exit()
+
+
+def taskUpdateGroups():
+    ud = UpdateData()
+    semesters = range(1, len(Semester.objects.all()) + 1)
+    ud.updateGroups(semesters)
+    ud.eu.exit()
+
+
+def taskUpdateStudentsAndProgressInGroup(i, code='ИУ6'):  # 23 - последний семестр (2018-02)
+    ud = UpdateData()
+    semester = Semester.objects.order_by('pk')[i]
+    groups = Group.objects.filter(subdepartament__code=code, semester=semester)
+    for group in groups:
+        print('start %s' % group.name)
+        print('updateSubjects')
+        ud.updateSubjectsInGroup(group.code, semester.code)
+        print('updateStudents')
+        ud.updateStudentsInGroup(group.code, semester.code)
+        print('updateProgress')
+        ud.updateProgressInGroup(group.code, semester.code)
+    ud.eu.exit()
+
+
+def taskUpdateSessionIngroup(i, code='ИУ6'):  # 23 - последний семестр (2018-02)
+    ud = UpdateData()
+    semester = Semester.objects.order_by('pk')[i]
+    groups = Group.objects.filter(subdepartament__code=code, semester=semester)
+    isMain = True
+    for i, group in enumerate(groups):
+        print('start %s. %s/ %s' % (group.name, i, len(groups)))
+        ud.updateSessionInGroup(group.code, semester.code, isMain)
+        if isMain:
+            isMain = False
+    ud.eu.exit()

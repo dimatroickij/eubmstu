@@ -140,6 +140,9 @@ class Session(models.Model):
                    ('Прк', 'Практика'),
                    ('РЭ', 'Рейтинговый экзамен'),
                    ('НРС', 'НРС'),
+                   ('НИД', 'Научно-исследовательская деятельность'),
+                   ('ЭК', 'ЭК'),
+                   ('НКР', 'Научно-квалификационная работа')
                    )
 
     subject = models.ForeignKey(GroupSubject, on_delete=models.CASCADE, verbose_name='Предмет')
