@@ -131,6 +131,7 @@ class UpdateData:
             try:
                 stud.full_clean()
                 stud.save()
+                return stud.pk
             except ValidationError:
                 pass
         except OperationalError:
@@ -180,16 +181,12 @@ class UpdateData:
             for i, student in enumerate(newListStudents['students']):
                 try:
                     find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
-                    if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
-                        lastGroup = Group.objects.get(students=find, semester__code=semester)
-                        lastGroup.students.remove(find)
-                    group.students.add(find)
                 except Student.DoesNotExist:
                     search = self.eu.searchStudents(i)
-                    name = student['name'].split(' ')
+                    name = search['name'].split(' ')
                     if len(name) == 2:
                         name.append('')
-                    self.saveStudents(search)
+                    find = Student.objects.get(pk=self.saveStudents(search))
                     # try:
                     #     oldStudents.remove({'gradebook': student['gradeBook']})
                     # except ValueError:
@@ -197,6 +194,10 @@ class UpdateData:
                     # if len(oldStudents) != 0:
                     #     for old in oldStudents:
                     #         group.students.remove(Student.objects.get(gradebook=old['gradebook']))
+                if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
+                    lastGroup = Group.objects.get(students=find, semester__code=semester)
+                    lastGroup.students.remove(find)
+                group.students.add(find)
             return True
         except RuntimeError as err:
             return err

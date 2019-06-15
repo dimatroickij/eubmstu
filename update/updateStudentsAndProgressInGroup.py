@@ -11,3 +11,4 @@ for group in groups:
     ud.updateStudentsInGroup(group.code, semester.code)
     print('updateProgress')
     ud.updateProgressInGroup(group.code, semester.code)
+    print('end %s' % group.name)

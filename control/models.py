@@ -111,7 +111,7 @@ class GroupSubject(models.Model):
 class Progress(models.Model):
     subject = models.ForeignKey(GroupSubject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
-    point = models.IntegerField('Количество баллов за предмет')
+    point = models.IntegerField('Количество баллов за предмет', null=True, blank=True)
 
     def __str__(self):
         return self.subject.subject.name + ' - ' + self.student.last_name
@@ -143,7 +143,7 @@ class Session(models.Model):
     subject = models.ForeignKey(GroupSubject, on_delete=models.CASCADE, verbose_name='Предмет')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Студент')
     type_rating = models.CharField('Тип оценки', max_length=5, choices=TYPE_RATING)
-    rating = models.CharField('Оценка', max_length=4, choices=RATING)
+    rating = models.CharField('Оценка', max_length=4, choices=RATING, null=True, blank=True)
 
     def __str__(self):
         return self.subject.subject.name + ' - ' + self.student.last_name

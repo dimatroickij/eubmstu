@@ -263,11 +263,11 @@ class GetDataEU:
     def searchStudents(self, i):
         try:
             student = self.driver.find_element(By.XPATH,
-                                               "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[2]//nobr/span[@class='fio_3']" % i + 1).text.split(
-                ' ')[0]
+                                               "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[2]//nobr/span[@class='fio_3']" % (
+                                                           i + 1)).get_attribute('innerHTML'),
             gradeBook = self.driver.find_element(By.XPATH,
-                                                 "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[3]" % i).text
-            return {'name': student,
+                                                 "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[3]" % (i + 1)).text
+            return {'name': ''.join(student).replace('&nbsp;', ' ').replace('\n', '').replace('\t', ''),
                     'gradebook': gradeBook}
         except Exception as e:
             print(str(e))
@@ -306,10 +306,13 @@ class GetDataEU:
     def formatProgress(self, cell, subject, i, j):
         try:
             if (cell != 'КМ' and cell != 'СЗ' and cell != 'ЛР'):
-                return {'subject': subject,
+                response = {'subject': subject,
                         'point': self.driver.find_element(By.XPATH,
                                                           "//table[@class='standart_table progress_students vertical_hover table-group']//tbody/tr[%s]/td[%s]" % (
                                                               i, j)).text}
+                if response['point'] == '':
+                    response['point'] = 0
+                return response
             else:
                 return []
         except Exception as e:
