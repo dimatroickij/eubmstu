@@ -306,7 +306,8 @@ def taskUpdateStudentsAndProgressInGroup(i, code='ИУ6'):  # 23 - послед�
         ud.updateProgressInGroup(group.code, semester.code)
     ud.eu.exit()
 
-
+#from update.tasks import taskUpdateSessionIngroup
+#taskUpdateSessionIngroup(23)
 def taskUpdateSessionIngroup(i, code='ИУ6'):  # 23 - последний семестр (2018-02)
     ud = UpdateData()
     semester = Semester.objects.order_by('pk')[i]
