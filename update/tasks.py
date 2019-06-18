@@ -314,7 +314,7 @@ def taskUpdateSessionIngroup(i, code='ИУ6'):  # 23 - последний сем
     groups = Group.objects.filter(subdepartament__code=code, semester=semester)
     isMain = True
     for i, group in enumerate(groups):
-        print('start %s. %s/ %s' % (group.name, i, len(groups)))
+        print('start %s. %s/ %s' % (group.name, i + 1, len(groups)))
         ud.updateSessionInGroup(group.code, semester.code, isMain)
         if isMain:
             isMain = False
