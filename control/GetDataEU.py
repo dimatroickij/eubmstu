@@ -386,6 +386,7 @@ class GetDataEU:
                 )
             for i, student in enumerate(self.driver.find_elements(By.XPATH, '//tbody/tr')):
                 listStudent = {
+                    # 'last_name': self.driver.find_element(By.XPATH, '//tbody/tr[%s]/td[2]' % (i + 1)).text.strip(),
                     'gradeBook': self.driver.find_element(By.XPATH, '//tbody/tr[%s]/td[3]' % (i + 1)).text.strip(),
                     'session': []}
                 for j in range(4, count + 1):

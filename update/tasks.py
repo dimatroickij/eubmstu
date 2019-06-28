@@ -262,6 +262,7 @@ class UpdateData:
                 try:
                     find = students.get(gradebook=session['gradeBook'])
                 except Student.DoesNotExist:
+                    #Добавить возврат фамилии!!!
                     find = Student.objects.get(gradebook=session['gradeBook'])
                     group.students.add(find)
                 for cell in session['session']:
