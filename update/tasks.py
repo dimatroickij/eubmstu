@@ -179,6 +179,7 @@ class UpdateData:
         try:
             # oldStudents = list(group.students.all().values('gradebook', 'last_name'))
             newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
+
             for i, student in enumerate(newListStudents['students']):
                 try:
                     find = Student.objects.get(last_name=student['student'], gradebook=student['gradeBook'])
@@ -187,7 +188,10 @@ class UpdateData:
                     name = search['name'].split(' ')
                     if len(name) == 2:
                         name.append('')
-                    find = Student.objects.get(pk=self.saveStudents(search))
+                    try:
+                        find = Student.objects.get(pk=self.saveStudents(search))
+                    except Student.DoesNotExist:
+                        find = Student.objects.get(gradebook='000000')
                     # try:
                     #     oldStudents.remove({'gradebook': student['gradeBook']})
                     # except ValueError:
@@ -306,8 +310,9 @@ def taskUpdateStudentsAndProgressInGroup(i, code='ИУ6'):  # 23 - послед�
         ud.updateProgressInGroup(group.code, semester.code)
     ud.eu.exit()
 
-#from update.tasks import taskUpdateSessionIngroup
-#taskUpdateSessionIngroup(23)
+
+# from update.tasks import taskUpdateSessionIngroup
+# taskUpdateSessionIngroup(23)
 def taskUpdateSessionIngroup(i, code='ИУ6'):  # 23 - последний семестр (2018-02)
     ud = UpdateData()
     semester = Semester.objects.order_by('pk')[i]
