@@ -259,11 +259,17 @@ class UpdateData:
                                         'type_rating': subject['type_rating']})
             students = group.students.all()
             for session in response['sessions']:
+                try:
+                    find = students.get(gradebook=session['gradeBook'])
+                except Student.DoesNotExist:
+                    find = Student.objects.get(gradebook=session['gradeBook'])
+                    group.students.add(find)
                 for cell in session['session']:
                     record = Session(subject=listSubject[cell['numSubject']]['subject'],
-                                     student=students.get(gradebook=session['gradeBook']),
+                                     student=find,
                                      type_rating=listSubject[cell['numSubject']]['type_rating'],
                                      rating=cell['rating'])
+
                     try:
                         record.full_clean()
                     except ValidationError:
