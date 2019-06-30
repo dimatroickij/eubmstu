@@ -335,6 +335,7 @@ def taskUpdateSessionIngroup(i, code='ИУ6'):  # 23 - последний сем
 def taskUpdateStudentsInGroup(sems, code='ИУ6'):  # 23 - последний семестр (2018-02)
     ud = UpdateData()
     for sem in sems:
+        print('%s semester' % sem)
         semester = Semester.objects.order_by('pk')[sem]
         groups = Group.objects.filter(subdepartament__code=code, semester=semester)
         for i, group in enumerate(groups):
