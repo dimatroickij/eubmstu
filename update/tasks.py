@@ -318,7 +318,7 @@ def taskUpdateStudentsAndProgressInGroup(i, code='ИУ6'):  # 23 - послед�
     ud.eu.exit()
 
 
-# from update.tasks import taskUpdateSessionIngroup
+    # from update.tasks import taskUpdateSessionIngroup
 # taskUpdateSessionIngroup(23)
 def taskUpdateSessionIngroup(i, code='ИУ6'):  # 23 - последний семестр (2018-02)
     ud = UpdateData()
@@ -330,4 +330,14 @@ def taskUpdateSessionIngroup(i, code='ИУ6'):  # 23 - последний сем
         ud.updateSessionInGroup(group.code, semester.code, isMain)
         if isMain:
             isMain = False
+    ud.eu.exit()
+
+def taskUpdateStudentsInGroup(sems, code='ИУ6'):  # 23 - последний семестр (2018-02)
+    ud = UpdateData()
+    for sem in sems:
+        semester = Semester.objects.order_by('pk')[sem]
+        groups = Group.objects.filter(subdepartament__code=code, semester=semester)
+        for i, group in enumerate(groups):
+            print('start %s. %s/ %s' % (group.name, i + 1, len(groups)))
+            ud.updateStudentsInGroup(group.code, semester.code)
     ud.eu.exit()
