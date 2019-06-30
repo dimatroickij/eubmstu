@@ -32,6 +32,7 @@ class Subdepartament(models.Model):
     code = models.CharField('Код кафедры', max_length=11, unique=True)
     name = models.CharField('Название кафедры', max_length=200)
     departament = models.ForeignKey(Departament, on_delete=models.CASCADE, verbose_name='Факультет')
+    prove = models.BooleanField(default=False)
 
     def __str__(self):
         return self.code
