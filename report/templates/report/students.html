@@ -1,0 +1,105 @@
+{% extends 'application.html' %}
+{% block title %}Поиск студентов{% endblock %}
+{% block contentSite %}
+    <div class="container">
+        <div class="alert alert-primary text-center" role="alert">
+            Найдено: {{ studentsSize }}
+        </div>
+        <div class="alert alert-light">
+            <form id="sortForm" action="">
+                <div class="material-icons" style="font-size: 18px">
+                    {% for field in form.ordering %}
+                        {{ field }}
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {% for field in form.search %}
+                        {{ field }}
+                    {% endfor %}
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary mb-2">Найти</button>
+                    </div>
+                </div>
+                <div class="form-check form-check-inline">
+                    {% for field in form.iexact %}
+                        {{ field }}
+                        <label class="form-check-label">Полное совпадение</label>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+        {% with url="?ordering="|add:ordering|add:"&search="|add:search|add:"&iexact="|add:iexact %}
+            <div class="alert alert-light">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        {% if students.number == 1 %}
+                            <li class="page-item disabled">
+                                {% else %}
+                            <li class="page-item">
+                        {% endif %}
+                        <a class="page-link" href="{{ url }}&page=1" aria-label="Next">
+                            <span aria-hidden="true">Первая</span>
+                        </a>
+                        </li>
+
+                        {% if students.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url }}&page={{ students.previous_page_number }}"
+                                   aria-label="Next">
+                                    {{ students.previous_page_number }}
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <div class="page-link">{{ students.number }}</div>
+                        </li>
+
+                        {% if students.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url }}&page={{ students.next_page_number }}">
+                                    {{ students.next_page_number }}
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% if students.number == students.paginator.num_pages %}
+                            <li class="page-item disabled">
+                                {% else %}
+                            <li class="page-item">
+                        {% endif %}
+                        <a class="page-link" href="{{ url }}&page={{ students.paginator.num_pages }}"
+                           aria-label="Next">
+                            <span aria-hidden="true">Последняя</span>
+                        </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        {% endwith %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Отчество</th>
+                <th scope="col">Группа</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for student in students %}
+                <tr>
+                    <td>{{ student.last_name }}</td>
+                    <td>{{ student.first_name }}</td>
+                    <td>{{ student.patronymic }}</td>
+                    <td>
+                        {% for group in student.group %}
+                            {{ group.name }} ({{ group.semester.code }})<br/>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

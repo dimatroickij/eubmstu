@@ -1,8 +1,10 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import render
 
 # Create your views here.
-from control.models import Progress, Group, Session, GroupSubject
+from control.models import Progress, Group, Session, GroupSubject, Student
+from report.forms import StudentsFilterForm
 
 
 @login_required
@@ -25,7 +27,8 @@ def show(request, group, code):
         while reports.filter(student=students[i]).count() == 0:
             i += 1
         subjects = sorted(list(map(lambda x: {'subject': GroupSubject.objects.get(pk=x['subject']).subject.name,
-                                              'subDep': GroupSubject.objects.get(pk=x['subject']).subject.subdepartament},
+                                              'subDep': GroupSubject.objects.get(
+                                                  pk=x['subject']).subject.subdepartament},
                                    reports.filter(student=students[i]).values('subject'))), key=lambda x: x['subject'])
         if code == 1:
             for student in students:
@@ -45,3 +48,35 @@ def show(request, group, code):
                                                 'reports': sorted(mass, key=lambda x: x['student'].last_name),
                                                 'subjects': subjects,
                                                 'semester': group.semester.name})
+
+
+def students(request):
+    students = Student.objects.all()
+    form = StudentsFilterForm(request.GET)
+    sort = 'last_name'
+    search = ''
+    iexact = ''
+    if form.is_valid():
+        if form.cleaned_data["search"]:
+            try:
+                if form.cleaned_data["iexact"]:
+                    students = students.filter(last_name__iexact=form.cleaned_data["search"].lower()) | \
+                               students.filter(first_name__iexact=form.cleaned_data["search"].lower())
+                    iexact = 'on'
+                else:
+                    students = students.filter(last_name__icontains=form.cleaned_data["search"].lower()) | \
+                               students.filter(first_name__icontains=form.cleaned_data["search"].lower())
+                search = form.cleaned_data["search"]
+            except Student.DoesNotExist:
+                pass
+        if form.cleaned_data["ordering"]:
+            students = students.order_by(form.cleaned_data["ordering"])
+            sort = form.cleaned_data["ordering"]
+    for student in students:
+         student.group = Group.objects.filter(students=student).order_by('semester')
+    paginator = Paginator(students, 10)
+    page = request.GET.get('page')
+    stusentsPaginator = paginator.get_page(page)
+    return render(request, 'report/students.html',
+                  {'students': stusentsPaginator, 'studentsSize': students.count(), 'form': form, 'ordering': sort,
+                   'search': search, 'iexact': iexact}, )
