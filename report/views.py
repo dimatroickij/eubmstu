@@ -49,7 +49,7 @@ def show(request, group, code):
                                                 'subjects': subjects,
                                                 'semester': group.semester.name})
 
-
+@login_required
 def students(request):
     students = Student.objects.all()
     form = StudentsFilterForm(request.GET)
@@ -80,3 +80,9 @@ def students(request):
     return render(request, 'report/students.html',
                   {'students': stusentsPaginator, 'studentsSize': students.count(), 'form': form, 'ordering': sort,
                    'search': search, 'iexact': iexact}, )
+
+@login_required
+def student(request, id):
+    student = Student.objects.get(pk=id)
+    return render(request, 'report/student.html',
+                  {'student': student, 'groups': Group.objects.filter(students=student).order_by('semester')})

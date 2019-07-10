@@ -1,0 +1,30 @@
+{% extends 'application.html' %}
+{% block title %}{{ student.last_name }} {{ student.first_name }} {{ student.patronymic }}{% endblock %}
+{% block contentSite %}
+    <div class="container">
+        <h3 class="text-center">{{ student.last_name }} {{ student.first_name }} {{ student.patronymic }}
+            <small class="text-muted">{{ student.gradebook }}</small>
+        </h3>
+        {% for group in groups %}
+            <div class="card mb-2">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" style="display: flex; align-items: flex-start;justify-content: space-between">
+                        <h6>{{ group.name }}</h6>
+                        <small class="text-muted">{{ group.semester.name }}</small>
+                        <div>
+                            <a data-toggle="collapse" href="#collapse{{ group.pk }}" role="button"
+                               aria-expanded="false" aria-controls="collapseExample">
+                                <i class="material-icons">
+                                    expand_more
+                                </i>
+                            </a>
+                        </div>
+                    </li>
+                    <li class="list-group-item collapse" id="collapse{{ group.pk }}">
+                        Список предметов с баллами и оценкой
+                    </li>
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
