@@ -24,13 +24,13 @@ if platform.system() == 'Linux':
 elif platform.system() == 'Windows':
     config.read('\\'.join(BASE_DIR.split('\\')[0:-1]) + '\\settings.ini')
 
-USERNAME = config.get('login', 'username')
-PASSWORD = config.get('login', 'password')
+USERNAME = config.get('eubmstu', 'username')
+PASSWORD = config.get('eubmstu', 'password')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.get('secret', 'SECRET_KEY')
+SECRET_KEY = config.get('eubmstu', 'SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -96,7 +96,7 @@ DATABASES = {
         'NAME': 'eubmstu',
         'USER': config.get('databases', 'USER'),
         'PASSWORD': config.get('databases', 'PASSWORD'),
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': 'POST',
         'TEST': {
             'NAME': 'eubmstu_test',
@@ -151,8 +151,8 @@ STATICFILES_DIRS = [
 ]
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-RECAPTCHA_PRIVATE_KEY = config.get('recapcha', 'RECAPTCHA_PRIVATE_KEY')
-RECAPTCHA_PUBLIC_KEY = config.get('recapcha', 'RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = config.get('eubmstu', 'RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_PUBLIC_KEY = config.get('eubmstu', 'RECAPTCHA_PUBLIC_KEY')
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
