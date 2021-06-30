@@ -5,9 +5,9 @@ gunicorn
 psycopg2-binary
 psycopg2
 requests
-celery
+Celery==4.4.7
 django-celery-results
 django-celery-beat
 selenium
 pyvirtualdisplay
-fcntl
+beautifulsoup4

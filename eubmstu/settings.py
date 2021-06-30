@@ -93,10 +93,10 @@ WSGI_APPLICATION = 'eubmstu.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'eubmstu',
+        'NAME': 'eubmstu_test',
         'USER': config.get('databases', 'USER'),
         'PASSWORD': config.get('databases', 'PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': 'dimatroickij.ru',
         'PORT': 'POST',
         'TEST': {
             'NAME': 'eubmstu_test',
@@ -168,3 +168,4 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'Europe/Moscow'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

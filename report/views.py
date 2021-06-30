@@ -57,7 +57,8 @@ def students(request):
     search = ''
     iexact = ''
     if form.is_valid():
-        if form.cleaned_data["search"]:
+        print("#" + form.cleaned_data["search"] + "#")
+        if form.cleaned_data["search"] and form.cleaned_data["search"] != None:
             try:
                 if form.cleaned_data["iexact"]:
                     students = students.filter(last_name__iexact=form.cleaned_data["search"].lower()) | \

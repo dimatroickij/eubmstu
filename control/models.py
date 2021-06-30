@@ -4,6 +4,7 @@ from django.db import models
 class Semester(models.Model):
     name = models.CharField('Название', max_length=40, unique=True)
     code = models.CharField('Код', max_length=20, blank=True, unique=True)
+    session = models.IntegerField('Код для сессии', blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -50,6 +51,7 @@ class Student(models.Model):
     patronymic = models.CharField('Отчество', max_length=150, blank=True)
     gradebook = models.CharField('Номер зачётной книжки', max_length=15)
     isStudying = models.BooleanField('Обучается ли сейчас студент', default=True)
+    guid = models.UUIDField('ID студента в системе', primary_key=False, null=True, blank=True)
 
     def __str__(self):
         return self.last_name + ' ' + self.first_name + ' ' + self.patronymic
