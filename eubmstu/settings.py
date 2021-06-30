@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'eubmstu.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'eubmstu_test',
+        'NAME': 'eubmstu',
         'USER': config.get('databases', 'USER'),
         'PASSWORD': config.get('databases', 'PASSWORD'),
         'HOST': 'dimatroickij.ru',
