@@ -86,7 +86,7 @@ class Group(models.Model):
 
 
 class Subject(models.Model):
-    name = models.CharField('Название', max_length=200)
+    name = models.CharField('Название', max_length=500)
     subdepartament = models.ForeignKey(Subdepartament, on_delete=models.CASCADE, verbose_name='Кафедра')
 
     def __str__(self):

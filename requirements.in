@@ -5,7 +5,7 @@ gunicorn
 psycopg2-binary
 psycopg2
 requests
-Celery==4.4.7
+Celery
 django-celery-results
 django-celery-beat
 selenium

@@ -24,10 +24,8 @@ class GetDataEU:
             # chrome_options.add_argument('--no-sandbox')
             # driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=chrome_options,
             #                           service_args=['--verbose', '--log-path=/tmp/chromedriver.log'])
-            from pyvirtualdisplay import Display
-            self.display = Display(visible=0, size=(1920, 1080))
-            self.display.start()
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver'), 0, self.options)
+            self.driver.maximize_window()
         elif platform.system() == 'Windows':
             self.driver = webdriver.Chrome(os.path.join(BASE_DIR, 'chromedriver.exe'), 0, self.options)
         self.username = username
@@ -166,7 +164,7 @@ class GetDataEU:
             student = {'name': re.sub(r'\s+', ' ', self.driver.find_element(By.XPATH,
                                                                             "//table[@class='students-table']//tbody/tr[%s]/td[2]" % (
                                                                                 number)).text).strip(),
-                       'gradebook': self.driver.find_element(By.XPATH,
+                       'gradeBook': self.driver.find_element(By.XPATH,
                                                              "//table[@class='students-table']//tbody/tr[%s]/td[3]" % (
                                                                  number)).text
                        }
@@ -185,7 +183,7 @@ class GetDataEU:
             soup = BeautifulSoup(self.driver.page_source, "html.parser")
             students = soup.find('table', {'class': 'students-table'}).find('tbody').findAll('tr')
             return list(
-                map(lambda x: {'name': x.findAll('td')[1].text, 'gradebook': x.findAll('td')[2].text, 'guid': None},
+                map(lambda x: {'student': x.findAll('td')[1].text, 'gradeBook': x.findAll('td')[2].text, 'guid': None},
                     students))
         except Exception as e:
             print(str(e))

@@ -118,12 +118,12 @@ class UpdateData:
 
     def saveStudents(self, students):
         for student in students:
-            name = student['name'].split(' ')
+            name = student['student'].split(' ')
             if len(name) == 2:
                 name.append('')
             try:
                 stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
-                               gradebook=student['gradebook'], guid=student['guid'])
+                               gradebook=student['gradeBook'], guid=student['guid'])
                 try:
                     stud.full_clean()
                     stud.save()
@@ -171,7 +171,7 @@ class UpdateData:
     def updateStudentsInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            # oldStudents = list(group.students.all().values('gradebook', 'last_name'))
+            # oldStudents = list(group.students.all().values('gradeBook', 'last_name'))
             newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
 
             for i, student in enumerate(newListStudents['students']):
@@ -187,12 +187,12 @@ class UpdateData:
                     except Student.DoesNotExist:
                         find = Student.objects.get(gradebook='000000')
                     # try:
-                    #     oldStudents.remove({'gradebook': student['gradeBook']})
+                    #     oldStudents.remove({'gradeBook': student['gradeBook']})
                     # except ValueError:
                     #     pass
                     # if len(oldStudents) != 0:
                     #     for old in oldStudents:
-                    #         group.students.remove(Student.objects.get(gradebook=old['gradebook']))
+                    #         group.students.remove(Student.objects.get(gradebook=old['gradeBook']))
                 if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
                     lastGroup = Group.objects.get(students=find, semester__code=semester)
                     lastGroup.students.remove(find)
