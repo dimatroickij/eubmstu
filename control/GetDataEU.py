@@ -265,11 +265,12 @@ class GetDataEU:
     # Получение результатов сдачи сессии группой по студентам и получение предметов у группы (работа функции по флагам)
     # group - код группы
     # semester - код семестра
-    def getSessionInGroup(self, group, code):
+    def getSessionInGroup(self, group, code, isMain):
         try:
             semester = Semester.objects.get(code=code)
-            link = '%s?session_id=%s' % (self.linkSession, semester.session)
-            self.driver.get(link)
+            if not isMain:
+                link = '%s?session_id=%s' % (self.linkSession, semester.session)
+                self.driver.get(link)
             link = '%s/group/%s/' % (self.linkSession, group)
             self.driver.get(link)
             soup = BeautifulSoup(self.driver.page_source, "html.parser")
@@ -287,7 +288,7 @@ class GetDataEU:
                                                                           'subDep': y[1]['subDep'],
                                                                           'type_rating': y[1]['type_rating'],
                                                                           'rating': x.findAll('td')[y[0]].find(
-                                                                              'span').text}, subjects))},
+                                                                              'span').get_text(strip=True)}, subjects))},
                                 soup.find('tbody').findAll('tr')))
 
             return {'subjects': subjects, 'sessions': sessions}

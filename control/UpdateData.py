@@ -1,6 +1,6 @@
 import re
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from psycopg2 import OperationalError
 
 from control.GetDataEU import GetDataEU
@@ -227,58 +227,79 @@ class UpdateData:
     # 57 секунд - 17 человек, 7 предметов
     # 1.05 - 20 человек, 7 предметов
     # 30 сек - 4 человека, 7 предметов
-    def updateSessionInGroup(self, code, semester):
+    def updateSessionInGroup(self, code, semester, isMain=False):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            response = self.eu.getSessionInGroup(code, semester)
+            response = self.eu.getSessionInGroup(code, semester, isMain)
             listSubject = []
-            for subject in response['subjects']:
-                try:
-                    listSubject.append(
-                        {'subject': GroupSubject.objects.get(group=group, subject__name=subject[1]['subject']),
-                         'type_rating': subject[1]['type_rating']})
-                except GroupSubject.DoesNotExist:
-                    newSubject = Subject(name=subject[1]['subject'],
-                                         subdepartament=Subdepartament.objects.get(code=subject[1]['subDep']))
+            if response:
+                for subject in response['subjects']:
                     try:
-                        newSubject.full_clean()
-                        newSubject.save()
-                    except ValidationError:
-                        newSubject = Subject.objects.get(name=subject[1]['subject'],
-                                                         subdepartament=Subdepartament.objects.get(
-                                                             code=subject[1]['subDep']))
-                    newGroupSubject = GroupSubject(subject=newSubject, group=group)
-                    newGroupSubject.save()
-                    listSubject.append({'subject': newGroupSubject,
-                                        'type_rating': subject[1]['type_rating']})
-            students = group.students.all()
-            for session in response['sessions']:
-                try:
-                    find = students.get(gradebook=session['gradeBook'])
-                    if find.guid == '' or find.guid is None:
-                        find.guid = session['guid']
-                        find.save()
-                except Student.DoesNotExist:
-                    # Добавить возврат фамилии!!!
-                    find = Student.objects.get(gradebook=session['gradeBook'])
-                    if find.guid == '' or find.guid is None:
-                        find.guid = session['guid']
-                        find.save()
-                    group.students.add(find)
-                for i, cell in enumerate(session['session']):
-                    record = Session(subject=listSubject[i]['subject'],
-                                     student=find,
-                                     type_rating=listSubject[i]['type_rating'],
-                                     rating=cell['rating'])
+                        listSubject.append(
+                            {'subject': GroupSubject.objects.get(group=group, subject__name=subject[1]['subject'],
+                                                                 subject__subdepartament__code=subject[1]['subDep']),
+                             'type_rating': subject[1]['type_rating']})
+                    except GroupSubject.DoesNotExist:
+                        newSubject = Subject(name=subject[1]['subject'],
+                                             subdepartament=Subdepartament.objects.get(code=subject[1]['subDep']))
+                        try:
+                            newSubject.full_clean()
+                            newSubject.save()
+                        except ValidationError:
+                            newSubject = Subject.objects.get(name=subject[1]['subject'],
+                                                             subdepartament=Subdepartament.objects.get(
+                                                                 code=subject[1]['subDep']))
+                        newGroupSubject = GroupSubject(subject=newSubject, group=group)
+                        newGroupSubject.save()
+                        listSubject.append({'subject': newGroupSubject,
+                                            'type_rating': subject[1]['type_rating']})
+                students = group.students.all()
+                for session in response['sessions']:
+                    try:
+                        find = students.get(gradebook=session['gradeBook'],
+                                            last_name=session['student'].split(' ')[0])
+                        if find.guid == '' or find.guid is None:
+                            find.guid = session['guid']
+                            find.save()
+                    except Student.MultipleObjectsReturned:
+                        find = students.get(guid=session['uuid'])
+                    except Student.DoesNotExist:
+                        # Добавить возврат фамилии!!!
+                        try:
+                            find = Student.objects.get(gradebook=session['gradeBook'],
+                                                       last_name=session['student'].split(' ')[0])
+                            if find.guid == '' or find.guid is None:
+                                find.guid = session['uuid']
+                                find.save()
+                        except Student.MultipleObjectsReturned:
+                            find = Student.objects.get(guid=session['uuid'], gradebook=session['gradeBook'],
+                                                       last_name=session['student'].split(' ')[0])
+                        except Student.DoesNotExist:
+                            name = session['student'].split(' ')
+                            if len(name) == 2:
+                                name.append('')
+                            find = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
+                                           gradebook=session['gradeBook'], guid=session['uuid'])
+                            find.full_clean()
+                            find.save()
+                        group.students.add(find)
+                    for i, cell in enumerate(session['session']):
+                        # print(listSubject[i]['subject'])
+                        record = Session(subject=listSubject[i]['subject'],
+                                         student=find,
+                                         type_rating=listSubject[i]['type_rating'],
+                                         rating=cell['rating'])
 
-                    try:
-                        record.full_clean()
-                    except ValidationError:
-                        record = Session.objects.get(subject=listSubject[i]['subject'],
-                                                     student=students.get(gradebook=session['gradeBook']),
-                                                     type_rating=listSubject[i]['type_rating'])
-                        record.rating = cell['rating']
-                    record.save()
+                        try:
+                            record.full_clean()
+                        except ValidationError:
+                            record = Session.objects.get(subject=listSubject[i]['subject'],
+                                                         student=students.get(gradebook=session['gradeBook'],
+                                                                              last_name=session['student'].split(' ')[
+                                                                                  0]),
+                                                         type_rating=listSubject[i]['type_rating'])
+                            record.rating = cell['rating']
+                        record.save()
             return True
         except RuntimeError as err:
             return err

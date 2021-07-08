@@ -103,11 +103,11 @@ class updateDB:
             self.s.updateSubjectsInGroup(group.code, semester)
             self.s.updateStudentsInGroup(group.code, semester)
 
-    def updateSessionInGroup(self, group, semester):
+    def updateSessionInGroup(self, group, semester, isMain=False):
         print('Обновление результатов сессии в группе %s семестра %s' % (group, semester))
-        self.s.updateSessionInGroup(group, semester)
+        self.s.updateSessionInGroup(group, semester, isMain)
 
-    def updateSessionInSemester(self, semester, start=0):
+    def updateSessionInSemester(self, semester, start=0, isMain=False):
         print('Обновление результатов сессии в группах семестра %s' % semester)
         groups = Group.objects.filter(semester__code=semester)[start:]
         count = len(groups)
@@ -115,4 +115,4 @@ class updateDB:
         for group in groups:
             print('%i / %i Группа %s' % (i, count, group.name))
             i += 1
-            self.s.updateSessionInGroup(group.code, semester)
+            self.s.updateSessionInGroup(group.code, semester, isMain)
