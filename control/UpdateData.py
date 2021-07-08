@@ -204,21 +204,26 @@ class UpdateData:
     def updateProgressInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
-            listProgress = self.eu.getProgressInGroup(code, semester, False, False, True)
-            students = group.students.all().order_by('last_name', 'first_name', 'patronymic')
-            for i, progress in enumerate(listProgress['progress']):
-                for cell in progress:
-                    subject = GroupSubject.objects.filter(group=group).get(subject__name=cell['subject'])
+            listProgress = self.eu.getProgressInGroup(code, semester, True, True, True)
+            subjects = list(map(lambda x: GroupSubject.objects.get(group=group,
+                                                                   subject=Subject.objects.get(name=x['subject'],
+                                                                                               subdepartament__code=x[
+                                                                                                   'subDep'])),
+                                listProgress['subjects']))
+            students = list(map(lambda x: Student.objects.get(last_name=x['student'].split(' ')[0],
+                                                              gradebook=x['gradeBook']), listProgress['students']))
+
+            for i, student in enumerate(students):
+                for j, subject in enumerate(subjects):
                     try:
-                        record = Progress(subject=subject, student=students[i], point=cell['point'])
+                        record = Progress(subject=subject, student=student,
+                                          point=listProgress['progress'][i][j]['point'])
                         record.full_clean()
                         record.save()
                     except ValidationError:
-                        record = Progress.objects.get(subject=subject, student=students[i])
-                        record.point = cell['point']
+                        record = Progress.objects.get(subject=subject, student=student)
+                        record.point = listProgress['progress'][i][j]['point']
                         record.save()
-                    except IndexError:
-                        print('no exist %s' % progress)
             return True
         except RuntimeError as err:
             return err

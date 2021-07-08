@@ -226,7 +226,9 @@ class GetDataEU:
                                                                       'table-group'}).find('thead').find('tr')
                                          .findAll('th')[3:-3]))
             formatNameColumns = list(map(lambda x: {'i': x[0] + 3, 'subject': x[1]['title'],
-                                                    'type': x[1].text.split('\n')[2]}, nameColumns))
+                                                    'type': x[1].text.split('\n')[2],
+                                                    'subDep': x[1].find('span').text.split('(')[1].replace(')', '')},
+                                         nameColumns))
             columnSubjects = list(filter(lambda x: x['type'] != 'СЗ' and x['type'] != 'ЛР' and x['type'] != 'КМ',
                                          formatNameColumns))
             progress = list(map(lambda x: list(map(lambda y: {'subject': y['subject'],
