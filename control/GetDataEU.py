@@ -183,7 +183,7 @@ class GetDataEU:
             soup = BeautifulSoup(self.driver.page_source, "html.parser")
             students = soup.find('table', {'class': 'students-table'}).find('tbody').findAll('tr')
             return list(
-                map(lambda x: {'student': x.findAll('td')[1].text, 'gradeBook': x.findAll('td')[2].text, 'guid': None},
+                map(lambda x: {'student': x.findAll('td')[1].text, 'gradeBook': x.findAll('td')[2].text, 'uuid': None},
                     students))
         except Exception as e:
             print(str(e))
@@ -209,7 +209,7 @@ class GetDataEU:
             students = list(map(lambda x: {
                 'student': x.findAll('td')[1].findAll('span')[1].text.replace('\t', '').replace('\n', '').
                                 replace('\xa0', ' '), 'gradeBook': x.findAll('td')[2].text,
-                'guid': x.findAll('td')[1].find('a')['href'].split('/')[-1]}, soup.find('table', {
+                'uuid': x.findAll('td')[1].find('a')['href'].split('/')[-1]}, soup.find('table', {
                 'class': 'standart_table progress_students vertical_hover table-group'}).find('tbody').findAll('tr')))
             return students
         except Exception as e:
@@ -218,13 +218,12 @@ class GetDataEU:
 
     # Получение результатов текущей успеваемости группы
     def getProgress(self):
-
         try:
             soup = BeautifulSoup(self.driver.page_source, "html.parser")
 
             nameColumns = list(enumerate(soup.find('table', {'class': 'standart_table progress_students vertical_hover '
                                                                       'table-group'}).find('thead').find('tr')
-                                         .findAll('th')[3:-3]))
+                                         .findAll('th', {'class': 'headcol-discipline'})))
             formatNameColumns = list(map(lambda x: {'i': x[0] + 3, 'subject': x[1]['title'],
                                                     'type': x[1].text.split('\n')[2],
                                                     'subDep': x[1].find('span').text.split('(')[1].replace(')', '')},
@@ -283,17 +282,20 @@ class GetDataEU:
                                                                                                              ''),
                                'type_rating': x.findAll('div')[1].find('i').text},
                     soup.find('thead').findAll('th')[3:]), 3))
-            sessions = list(map(lambda x: {'uuid': x['student-uuid'],
+            students = list(map(lambda x: {'uuid': x['student-uuid'],
                                            'student': x.findAll('td')[1].find('div', {'class': 'student-fio'})
-                                .find('span').text, 'gradeBook': x.findAll('td')[2].find('span').text,
-                                           'session': list(map(lambda y: {'subject': y[1]['subject'],
-                                                                          'subDep': y[1]['subDep'],
-                                                                          'type_rating': y[1]['type_rating'],
-                                                                          'rating': x.findAll('td')[y[0]].find(
-                                                                              'span').get_text(strip=True)}, subjects))},
+                                .find('span').text,
+                                           'gradeBook': x.findAll('td')[2].find('span').text},
+                                soup.find('tbody').findAll('tr')))
+            sessions = list(map(lambda x: list(map(lambda y: {'subject': y[1]['subject'],
+                                                               'subDep': y[1]['subDep'],
+                                                               'type_rating': y[1]['type_rating'],
+                                                               'rating': x.findAll('td')[y[0]].find(
+                                                                   'span').get_text(strip=True)},
+                                                    subjects)),
                                 soup.find('tbody').findAll('tr')))
 
-            return {'subjects': subjects, 'sessions': sessions}
+            return {'subjects': list(map(lambda x: x[1], subjects)), 'students': students, 'sessions': sessions}
         except Exception as e:
             print(str(e))
             return []

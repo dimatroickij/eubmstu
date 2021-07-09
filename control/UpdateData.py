@@ -123,7 +123,7 @@ class UpdateData:
                 name.append('')
             try:
                 stud = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
-                               gradebook=student['gradeBook'], guid=student['guid'])
+                               gradebook=student['gradeBook'], uuid=student['uuid'])
                 try:
                     stud.full_clean()
                     stud.save()
@@ -132,87 +132,130 @@ class UpdateData:
             except OperationalError:
                 self.saveStudents(student)
 
-    def updateSubjectsInGroup(self, groupCode, semester):
-        group = Group.objects.get(code=groupCode, semester__code=semester)
-        try:
-            listSubjects = self.eu.getProgressInGroup(groupCode, semester, True, False, False)
-            for subject in listSubjects['subjects']:
+    # def updateSubjectsInGroup(self, groupCode, semester):
+    #     group = Group.objects.get(code=groupCode, semester__code=semester)
+    #     try:
+    #         listSubjects = self.eu.getProgressInGroup(groupCode, semester, True, False, False)
+    #         for subject in listSubjects['subjects']:
+    #             try:
+    #                 subDep = Subdepartament.objects.get(code=subject['subDep'])
+    #             except Subdepartament.DoesNotExist:
+    #                 try:
+    #                     subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'],
+    #                                             departament=Departament.objects.get(
+    #                                                 code=re.sub(r'\d+', '', subject['subDep'])))
+    #                 except Departament.DoesNotExist:
+    #                     dep = Departament(code=re.sub(r'\d+', '', subject['subDep']),
+    #                                       name=re.sub(r'\d+', '', subject['subDep']))
+    #                     dep.save()
+    #                     subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'], departament=dep)
+    #                 subDep.full_clean()
+    #                 subDep.save()
+    #                 recordSubject = Subject(name=subject['subject'], subdepartament=subDep)
+    #                 recordSubject.save()
+    #             try:
+    #                 recordSubject = Subject.objects.get(name=subject['subject'], subdepartament=subDep)
+    #             except Subject.DoesNotExist:
+    #                 recordSubject = Subject(name=subject['subject'], subdepartament=subDep)
+    #                 recordSubject.save()
+    #             try:
+    #                 record = GroupSubject(group=group, subject=recordSubject)
+    #                 record.full_clean()
+    #                 record.save()
+    #             except ValidationError:
+    #                 pass
+    #         return True
+    #     except RuntimeError as err:
+    #         return err
+
+    # def updateStudentsInGroup(self, code, semester):
+    #     group = Group.objects.get(code=code, semester__code=semester)
+    #     try:
+    #         # oldStudents = list(group.students.all().values('gradeBook', 'last_name'))
+    #         newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
+    # 
+    #         for i, student in enumerate(newListStudents['students']):
+    #             try:
+    #                 find = Student.objects.get(last_name=student['student'].split(' ')[0],
+    #                                            gradebook=student['gradeBook'])
+    #                 if find.uuid is None or find.uuid == '':
+    #                     find.uuid = student['uuid']
+    #                     find.save()
+    #             except Student.DoesNotExist:
+    #                 try:
+    #                     find = Student.objects.get(pk=self.saveStudents([student]))
+    #                 except Student.DoesNotExist:
+    #                     find = Student.objects.get(gradebook='000000')
+    #                 # try:
+    #                 #     oldStudents.remove({'gradeBook': student['gradeBook']})
+    #                 # except ValueError:
+    #                 #     pass
+    #                 # if len(oldStudents) != 0:
+    #                 #     for old in oldStudents:
+    #                 #         group.students.remove(Student.objects.get(gradebook=old['gradeBook']))
+    #             if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
+    #                 lastGroup = Group.objects.get(students=find, semester__code=semester)
+    #                 lastGroup.students.remove(find)
+    #             group.students.add(find)
+    #         return True
+    #     except RuntimeError as err:
+    #         return err
+
+    def updateSubjectsInGroup(self, listSubjects, group):
+        subjects = []
+        for subject in listSubjects:
+            try:
+                subjects.append(GroupSubject.objects.get(group=group, subject__name=subject['subject'],
+                                                         subject__subdepartament__code=subject['subDep']))
+            except GroupSubject.DoesNotExist:
                 try:
-                    subDep = Subdepartament.objects.get(code=subject['subDep'])
-                except Subdepartament.DoesNotExist:
-                    try:
-                        subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'],
-                                                departament=Departament.objects.get(
-                                                    code=re.sub(r'\d+', '', subject['subDep'])))
-                    except Departament.DoesNotExist:
-                        dep = Departament(code=re.sub(r'\d+', '', subject['subDep']),
-                                          name=re.sub(r'\d+', '', subject['subDep']))
-                        dep.save()
-                        subDep = Subdepartament(code=subject['subDep'], name=subject['subDep'], departament=dep)
-                    subDep.full_clean()
-                    subDep.save()
-                    recordSubject = Subject(name=subject['subject'], subdepartament=subDep)
-                    recordSubject.save()
-                try:
-                    recordSubject = Subject.objects.get(name=subject['subject'], subdepartament=subDep)
+                    newSubject = Subject.objects.get(name=subject['subject'], subdepartament__code=subject['subDep'])
+                    sub = newSubject.name
                 except Subject.DoesNotExist:
-                    recordSubject = Subject(name=subject['subject'], subdepartament=subDep)
-                    recordSubject.save()
-                try:
-                    record = GroupSubject(group=group, subject=recordSubject)
-                    record.full_clean()
-                    record.save()
-                except ValidationError:
-                    pass
-            return True
-        except RuntimeError as err:
-            return err
+                    newSubject = Subject(name=subject['subject'],
+                                         subdepartament=Subdepartament.objects.get(code=subject['subDep']))
+                    newSubject.full_clean()
+                    newSubject.save()
+                newGroupSubject = GroupSubject(subject=newSubject, group=group)
+                newGroupSubject.save()
+                subjects.append(newGroupSubject)
+        return subjects
 
-    def updateStudentsInGroup(self, code, semester):
-        group = Group.objects.get(code=code, semester__code=semester)
-        try:
-            # oldStudents = list(group.students.all().values('gradeBook', 'last_name'))
-            newListStudents = self.eu.getProgressInGroup(code, semester, False, True, False)
-
-            for i, student in enumerate(newListStudents['students']):
+    def updateStudentsInGroup(self, lastStudents, group):
+        newListStudents = []
+        students = group.students.all()
+        for student in lastStudents:
+            try:
+                find = students.get(gradebook=student['gradeBook'],
+                                    last_name=student['student'].split(' ')[0])
+                if find.uuid == '' or find.uuid is None:
+                    find.uuid = student['uuid']
+                    find.save()
+            except Student.DoesNotExist:
                 try:
-                    find = Student.objects.get(last_name=student['student'].split(' ')[0],
-                                               gradebook=student['gradeBook'])
-                    if find.guid is None or find.guid == '':
-                        find.guid = student['guid']
+                    find = Student.objects.get(gradebook=student['gradeBook'],
+                                               last_name=student['student'].split(' ')[0])
+                    if find.uuid == '' or find.uuid is None:
+                        find.uuid = student['uuid']
                         find.save()
                 except Student.DoesNotExist:
-                    try:
-                        find = Student.objects.get(pk=self.saveStudents([student]))
-                    except Student.DoesNotExist:
-                        find = Student.objects.get(gradebook='000000')
-                    # try:
-                    #     oldStudents.remove({'gradeBook': student['gradeBook']})
-                    # except ValueError:
-                    #     pass
-                    # if len(oldStudents) != 0:
-                    #     for old in oldStudents:
-                    #         group.students.remove(Student.objects.get(gradebook=old['gradeBook']))
-                if Group.objects.filter(students=find, semester__code=semester).exclude(pk=group.pk).count() != 0:
-                    lastGroup = Group.objects.get(students=find, semester__code=semester)
-                    lastGroup.students.remove(find)
+                    name = student['student'].split(' ')
+                    if len(name) == 2:
+                        name.append('')
+                    find = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
+                                   gradebook=student['gradeBook'], uuid=student['uuid'])
+                    find.full_clean()
+                    find.save()
                 group.students.add(find)
-            return True
-        except RuntimeError as err:
-            return err
+            newListStudents.append(find)
+        return newListStudents
 
     def updateProgressInGroup(self, code, semester):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
             listProgress = self.eu.getProgressInGroup(code, semester, True, True, True)
-            subjects = list(map(lambda x: GroupSubject.objects.get(group=group,
-                                                                   subject=Subject.objects.get(name=x['subject'],
-                                                                                               subdepartament__code=x[
-                                                                                                   'subDep'])),
-                                listProgress['subjects']))
-            students = list(map(lambda x: Student.objects.get(last_name=x['student'].split(' ')[0],
-                                                              gradebook=x['gradeBook']), listProgress['students']))
-
+            subjects = self.updateSubjectsInGroup(listProgress['subjects'], group)
+            students = self.updateStudentsInGroup(listProgress['students'], group)
             for i, student in enumerate(students):
                 for j, subject in enumerate(subjects):
                     try:
@@ -228,83 +271,26 @@ class UpdateData:
         except RuntimeError as err:
             return err
 
-    # 1.24 минуты - 19 человек, 7 предметов
-    # 57 секунд - 17 человек, 7 предметов
-    # 1.05 - 20 человек, 7 предметов
-    # 30 сек - 4 человека, 7 предметов
     def updateSessionInGroup(self, code, semester, isMain=False):
         group = Group.objects.get(code=code, semester__code=semester)
         try:
             response = self.eu.getSessionInGroup(code, semester, isMain)
-            listSubject = []
             if response:
-                for subject in response['subjects']:
-                    try:
-                        listSubject.append(
-                            {'subject': GroupSubject.objects.get(group=group, subject__name=subject[1]['subject'],
-                                                                 subject__subdepartament__code=subject[1]['subDep']),
-                             'type_rating': subject[1]['type_rating']})
-                    except GroupSubject.DoesNotExist:
-                        newSubject = Subject(name=subject[1]['subject'],
-                                             subdepartament=Subdepartament.objects.get(code=subject[1]['subDep']))
+                subjects = self.updateSubjectsInGroup(response['subjects'], group)
+                students = self.updateStudentsInGroup(response['students'], group)
+                for i, student in enumerate(students):
+                    for j, subject in enumerate(subjects):
                         try:
-                            newSubject.full_clean()
-                            newSubject.save()
-                        except ValidationError:
-                            newSubject = Subject.objects.get(name=subject[1]['subject'],
-                                                             subdepartament=Subdepartament.objects.get(
-                                                                 code=subject[1]['subDep']))
-                        newGroupSubject = GroupSubject(subject=newSubject, group=group)
-                        newGroupSubject.save()
-                        listSubject.append({'subject': newGroupSubject,
-                                            'type_rating': subject[1]['type_rating']})
-                students = group.students.all()
-                for session in response['sessions']:
-                    try:
-                        find = students.get(gradebook=session['gradeBook'],
-                                            last_name=session['student'].split(' ')[0])
-                        if find.guid == '' or find.guid is None:
-                            find.guid = session['guid']
-                            find.save()
-                    except Student.MultipleObjectsReturned:
-                        find = students.get(guid=session['uuid'])
-                    except Student.DoesNotExist:
-                        # Добавить возврат фамилии!!!
-                        try:
-                            find = Student.objects.get(gradebook=session['gradeBook'],
-                                                       last_name=session['student'].split(' ')[0])
-                            if find.guid == '' or find.guid is None:
-                                find.guid = session['uuid']
-                                find.save()
-                        except Student.MultipleObjectsReturned:
-                            find = Student.objects.get(guid=session['uuid'], gradebook=session['gradeBook'],
-                                                       last_name=session['student'].split(' ')[0])
-                        except Student.DoesNotExist:
-                            name = session['student'].split(' ')
-                            if len(name) == 2:
-                                name.append('')
-                            find = Student(last_name=name[0], first_name=name[1], patronymic=name[2],
-                                           gradebook=session['gradeBook'], guid=session['uuid'])
-                            find.full_clean()
-                            find.save()
-                        group.students.add(find)
-                    for i, cell in enumerate(session['session']):
-                        # print(listSubject[i]['subject'])
-                        record = Session(subject=listSubject[i]['subject'],
-                                         student=find,
-                                         type_rating=listSubject[i]['type_rating'],
-                                         rating=cell['rating'])
-
-                        try:
+                            record = Session(subject=subject, student=student,
+                                             type_rating=response['sessions'][i][j]['type_rating'],
+                                             rating=response['sessions'][i][j]['rating'])
                             record.full_clean()
+                            record.save()
                         except ValidationError:
-                            record = Session.objects.get(subject=listSubject[i]['subject'],
-                                                         student=students.get(gradebook=session['gradeBook'],
-                                                                              last_name=session['student'].split(' ')[
-                                                                                  0]),
-                                                         type_rating=listSubject[i]['type_rating'])
-                            record.rating = cell['rating']
-                        record.save()
+                            record = Session.objects.get(subject=subject, student=student,
+                                                         type_rating=response['sessions'][i][j]['type_rating'])
+                            record.rating = response['sessions'][i][j]['rating']
+                            record.save()
             return True
         except RuntimeError as err:
             return err

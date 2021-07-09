@@ -51,7 +51,7 @@ class Student(models.Model):
     patronymic = models.CharField('Отчество', max_length=150, blank=True)
     gradebook = models.CharField('Номер зачётной книжки', max_length=15)
     isStudying = models.BooleanField('Обучается ли сейчас студент', default=True)
-    guid = models.UUIDField('ID студента в системе', primary_key=False, null=True, blank=True)
+    uuid = models.UUIDField('ID студента в системе', primary_key=False, null=True, blank=True)
 
     def __str__(self):
         return self.last_name + ' ' + self.first_name + ' ' + self.patronymic
@@ -137,6 +137,7 @@ class Session(models.Model):
               ('Напр', 'Направление'),
               ('Неуд', 'Неудовлетворительно'),
               ('Дк', 'Дк'),
+              ('Д', 'Дисциплина'),
               ('П', 'Подготовка')) #Подготовка к сдаче государственного экзамена до 31.12.YYYY
 
     TYPE_RATING = (('Кур', 'Курсовая'),
