@@ -96,7 +96,7 @@ DATABASES = {
         'NAME': 'eubmstu',
         'USER': config.get('databases', 'USER'),
         'PASSWORD': config.get('databases', 'PASSWORD'),
-        'HOST': '127.0.0.1',
+        'HOST': config.get('databases', 'HOST'),
         'PORT': 'POST',
         'TEST': {
             'NAME': 'eubmstu_test',
