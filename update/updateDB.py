@@ -74,7 +74,7 @@ class updateDB:
         self.s.updateSubjectsInGroup(group, semester)
         self.s.updateStudentsInGroup(group, semester)
         self.s.updateProgressInGroup(group, semester)
-            
+
     def updateSubAndStudAndProgressInSemester(self, semester, start=0):
         print('Обновление предметов, списка студентов, успеваемости в группах семестра %s' % semester)
         groups = Group.objects.filter(semester__code=semester)[start:]
@@ -112,7 +112,10 @@ class updateDB:
         groups = Group.objects.filter(semester__code=semester)[start:]
         count = len(groups)
         i = 1
+        f = open('%s.txt' % semester, 'a')
         for group in groups:
             print('%i / %i Группа %s' % (i, count, group.name))
+            f.write('%i / %i Группа %s\n' % (i, count, group.name))
             i += 1
             self.s.updateSessionInGroup(group.code, semester, isMain)
+        f.close()

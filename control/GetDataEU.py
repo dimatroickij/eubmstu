@@ -276,23 +276,30 @@ class GetDataEU:
             self.driver.get(link)
             soup = BeautifulSoup(self.driver.page_source, "html.parser")
 
+            try:
+                listSubjects = soup.find('thead').findAll('th')[3:]
+            except AttributeError:
+                print('В группе %s нет студентов' % group)
+                return []
+
             subjects = list(enumerate(
                 map(lambda x: {'subject': x.find('div', {'class': 'vertical-text'}).find('span').text,
                                'subDep': str(x.findAll('div')[1].find('i').parent).split('<br/>')[0].replace('<div>',
                                                                                                              ''),
                                'type_rating': x.findAll('div')[1].find('i').text},
-                    soup.find('thead').findAll('th')[3:]), 3))
+                    listSubjects), 3))
             students = list(map(lambda x: {'uuid': x['student-uuid'],
                                            'student': x.findAll('td')[1].find('div', {'class': 'student-fio'})
                                 .find('span').text,
                                            'gradeBook': x.findAll('td')[2].find('span').text},
                                 soup.find('tbody').findAll('tr')))
             sessions = list(map(lambda x: list(map(lambda y: {'subject': y[1]['subject'],
-                                                               'subDep': y[1]['subDep'],
-                                                               'type_rating': y[1]['type_rating'],
-                                                               'rating': x.findAll('td')[y[0]].find(
-                                                                   'span').get_text(strip=True)},
-                                                    subjects)),
+                                                              'subDep': y[1]['subDep'],
+                                                              'type_rating': y[1]['type_rating'],
+                                                              'rating': '' if x.findAll('td')[y[0]].find(
+                                                                  'span') is None else x.findAll('td')[y[0]].find(
+                                                                  'span').get_text(strip=True)},
+                                                   subjects)),
                                 soup.find('tbody').findAll('tr')))
 
             return {'subjects': list(map(lambda x: x[1], subjects)), 'students': students, 'sessions': sessions}
