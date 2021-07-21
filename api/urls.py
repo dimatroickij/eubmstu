@@ -4,5 +4,7 @@ from api import views
 
 app_name = 'api'
 urlpatterns = [
-    path('semesters', views.getSemesters, name='getSemesters')
+    path('semesters', views.getSemesters, name='getSemesters'),
+    path('departaments', views.getDepartaments, name='getDepartaments'),
+    path('subdepartaments/<int:departament>', views.getSubDepartaments, name='getSubDepartaments')
 ]

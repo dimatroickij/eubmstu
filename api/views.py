@@ -1,30 +1,23 @@
-from django.http import StreamingHttpResponse
+from django.contrib.auth.decorators import login_required
+from django.http import StreamingHttpResponse, JsonResponse, HttpResponse
 from django.shortcuts import render
 import csv
+from django.core import serializers
 
-from control.models import Semester
-
-
-class Echo:
-    """An object that implements just the write method of the file-like
-    interface.
-    """
-
-    def write(self, value):
-        """Write the value by returning it, instead of storing in a buffer."""
-        return value
+from control.models import Semester, Departament, Subdepartament
 
 
-def getSemesters(request):
-    """A view that streams a large CSV file."""
-    # Generate a sequence of rows. The range is based on the maximum number of
-    # rows that can be handled by a single sheet in most spreadsheet
-    # applications.
-    semesters = Semester.objects.all()
-    rows = (["Row {}".format(idx), str(idx)] for idx in range(65536))
-    pseudo_buffer = Echo()
-    writer = csv.writer(pseudo_buffer)
-    response = StreamingHttpResponse((writer.writerow(row) for row in rows),
-                                     content_type="text/csv")
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
-    return response
+@login_required
+def getSemesters(requests):
+    return HttpResponse(serializers.serialize('json', Semester.objects.all().order_by('code')),
+                        content_type='application/json')
+
+@login_required
+def getDepartaments(requests):
+    return HttpResponse(serializers.serialize('json', Departament.objects.all().order_by('code')),
+                        content_type='application/json')
+
+@login_required
+def getSubDepartaments(requests, departament):
+    return HttpResponse(serializers.serialize('json', Subdepartament.objects.filter(departament=departament).order_by('code')),
+                        content_type='application/json')
