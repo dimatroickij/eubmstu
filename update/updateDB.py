@@ -119,3 +119,7 @@ class updateDB:
             i += 1
             self.s.updateSessionInGroup(group.code, semester, isMain)
         f.close()
+
+
+#from control.models import Group, GroupSubject, Session
+#blankGroup = set(map(lambda x: x['group'], list(filter(lambda y: y['count'] == 0, map(lambda x: {'id-group-subject': x.pk, 'group': x.group, 'count': len(Session.objects.filter(subject=x))}, GroupSubject.objects.filter(group__in=Group.objects.filter(semester__code='2014-01')))))))

@@ -226,16 +226,18 @@ class GetDataEU:
                                          .findAll('th', {'class': 'headcol-discipline'})))
             formatNameColumns = list(map(lambda x: {'i': x[0] + 3, 'subject': x[1]['title'],
                                                     'type': x[1].text.split('\n')[2],
-                                                    'subDep': x[1].find('span').text.split('(')[1].replace(')', '')},
+                                                    'subDep': x[1].find('span').text.split('(')[-1].replace(')', '')},
                                          nameColumns))
             columnSubjects = list(filter(lambda x: x['type'] != 'СЗ' and x['type'] != 'ЛР' and x['type'] != 'КМ',
                                          formatNameColumns))
             progress = list(map(lambda x: list(map(lambda y: {'subject': y['subject'],
-                                                              'point': x.findAll('td')[y['i']].find('span').text},
+                                                              'point': 0 if x.findAll('td')[y['i']].find(
+                                                                  'span') is None else
+                                                              x.findAll('td')[y['i']].find('span').text},
                                                    columnSubjects)), soup.find('table', {
                 'class': 'standart_table progress_students vertical_hover table-group'}).find('tbody').findAll('tr')))
 
-            return progress
+            return {'subjects': columnSubjects, 'progress': progress}
         except Exception as e:
             print(str(e))
             return []
@@ -252,13 +254,13 @@ class GetDataEU:
             progress = []
             students = []
             subjects = []
-            if fSubjects:
-                subjects = self.getSubject()
-            if fStudents:
-                students = self.getStudentsInGroup()
             if fProgress:
                 progress = self.getProgress()
-            return {'subjects': subjects, 'students': students, 'progress': progress}
+            if fSubjects:
+                subjects = progress['subjects']
+            if fStudents:
+                students = self.getStudentsInGroup()
+            return {'subjects': subjects, 'students': students, 'progress': progress['progress']}
         except Exception as e:
             print(str(e))
             return []
