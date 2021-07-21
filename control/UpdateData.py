@@ -72,7 +72,7 @@ class UpdateData:
                 # print(semester.name)
                 try:
                     subDeps = Subdepartament.objects.exclude(departament__code='АДМИН').exclude(
-                        departament__code='ФВ').exclude(code='Л2')
+                        departament__code='ФВ').exclude(code__contains='АДМИН')
                     for subDep in subDeps:
                         try:
                             groups = self.eu.getGroups(subDep.code, semester.code)
@@ -239,7 +239,7 @@ class UpdateData:
                         find.uuid = student['uuid']
                         find.save()
                 except Student.DoesNotExist:
-                    name = re.sub(r"\s((\s)(\s+)?)?", "\\2", student['student']).split(' ')
+                    name = student['student'].strip().split(' ')
                     if len(name) == 2:
                         name.append('')
                     find = Student(last_name=name[0], first_name=name[1], patronymic=name[2],

@@ -118,9 +118,9 @@ class GetDataEU:
         if self.driver.current_url != link:
             self.driver.get(link)
         soup = BeautifulSoup(self.driver.page_source, "html.parser")
-        groups = list(filter(lambda x: x.find('a').text.find(subDep + '-') == 0, soup.findAll('li',
-                                                                                              {
-                                                                                                  'class': 'eu-tree-leaf'})))
+        groups = list(filter(lambda x: x.find('a').text.find(''.join(subDep.split('-')) + '-') == 0, soup.findAll('li',
+                                                                                                                  {
+                                                                                                                      'class': 'eu-tree-leaf'})))
         listGroups = list(map(lambda x: {'name': x.find('a').text, 'code': x.find('a')['href'].split('/')[-2],
                                          'levelEducation': x.find('a')['data-stage'], 'isEmpty': x.find('a')['class']},
                               groups))
