@@ -14,7 +14,7 @@ from eubmstu.settings import BASE_DIR
 
 @login_required
 def renameAndDeleteSubject(request):
-    for subject in Subject.objects.filter(pk__in=range(1000, 2000)).order_by('pk'):
+    for subject in Subject.objects.all().order_by('pk'):
         print('%i - %s' % (subject.pk, subject.name))
         subject.name = subject.name.strip().replace('  ', ' ').replace('  ', '')
         try:
