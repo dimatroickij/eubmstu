@@ -239,7 +239,7 @@ class UpdateData:
                         find.uuid = student['uuid']
                         find.save()
                 except Student.DoesNotExist:
-                    name = student['student'].strip().split(' ')
+                    name = student['student'].strip().replace('  ', ' ').split(' ')
                     if len(name) == 2:
                         name.append('')
                     find = Student(last_name=name[0], first_name=name[1], patronymic=name[2],

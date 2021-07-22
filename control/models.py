@@ -66,7 +66,8 @@ class Student(models.Model):
 class Group(models.Model):
     LEVEL_EDUCATION = (('bachelor', 'Бакалавриат'),
                        ('magister', 'Магистратура'),
-                       ('specialist', 'Специалитет / Аспирантура'))
+                       ('specialist', 'Специалитет / Аспирантура'),
+                       ('archive', 'Архивные записи'))
     name = models.CharField('Название группы', max_length=10)
     code = models.CharField('Код группы для сайта', max_length=50)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, verbose_name='Семестр')

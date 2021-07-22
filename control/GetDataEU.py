@@ -126,6 +126,17 @@ class GetDataEU:
                               groups))
         return listGroups
 
+    # Получение списка групп через страницу сессии
+    # subDep - код кафедры
+    # semester - код семестра
+    def getGroupsSession(self, subDep, semester):
+        soup = BeautifulSoup(self.driver.page_source, "html.parser")
+        groups = list(filter(lambda x: x.text.find(''.join(subDep.split('-')) + '-') == 0, soup.findAll('a', {'name': 'sdlk'})))
+        listGroups = list(map(lambda x: {'name': x.text, 'code': x['href'].split('/')[-2],
+                                         'levelEducation': 'archive', 'isEmpty': ''},
+                              groups))
+        return listGroups
+
     # Получение списка факультетов в модуле "Контингент"
     def getLinkDeps(self):
         try:
@@ -285,9 +296,9 @@ class GetDataEU:
                 return []
 
             subjects = list(enumerate(
-                map(lambda x: {'subject': x.find('div', {'class': 'vertical-text'}).find('span').text,
-                               'subDep': str(x.findAll('div')[1].find('i').parent).split('<br/>')[0].replace('<div>',
-                                                                                                             ''),
+                map(lambda x: {'subject': x.find('div', {'class': 'vertical-text'}).find('span').text.replace('\n', ''),
+                               'subDep': str(x.findAll('div')[1].find('i').parent).split('<br/>')[0]
+                    .replace('<div>', '').replace('\n', ''),
                                'type_rating': x.findAll('div')[1].find('i').text},
                     listSubjects), 3))
             students = list(map(lambda x: {'uuid': x['student-uuid'],
