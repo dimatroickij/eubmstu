@@ -49,44 +49,78 @@ def show(request, group, code):
                                                 'subjects': subjects,
                                                 'semester': group.semester.name})
 
+
 @login_required
 def students(request):
-    students = Student.objects.all()
     form = StudentsFilterForm(request.GET)
     sort = 'last_name'
     search = ''
     iexact = ''
+    listStudents = []
     if form.is_valid():
         print("#" + form.cleaned_data["search"] + "#")
-        if form.cleaned_data["search"] and form.cleaned_data["search"] != None:
+        z = form.cleaned_data["search"]
+        if form.cleaned_data["search"] and form.cleaned_data["search"] != '':
             try:
                 if form.cleaned_data["iexact"]:
-                    students = students.filter(last_name__iexact=form.cleaned_data["search"].lower()) | \
-                               students.filter(first_name__iexact=form.cleaned_data["search"].lower())
+                    listStudents = Student.objects.filter(last_name__iexact=form.cleaned_data["search"].lower()) | \
+                                   Student.objects.all().filter(first_name__iexact=form.cleaned_data["search"].lower())
                     iexact = 'on'
                 else:
-                    students = students.filter(last_name__icontains=form.cleaned_data["search"].lower()) | \
-                               students.filter(first_name__icontains=form.cleaned_data["search"].lower())
+                    listStudents = Student.objects.all().filter(
+                        last_name__icontains=form.cleaned_data["search"].lower()) | Student.objects.all().filter(
+                        first_name__icontains=form.cleaned_data["search"].lower())
                 search = form.cleaned_data["search"]
             except Student.DoesNotExist:
                 pass
-        if form.cleaned_data["ordering"]:
-            students = students.order_by(form.cleaned_data["ordering"])
-            sort = form.cleaned_data["ordering"]
-    for student in students:
-         student.group = Group.objects.filter(students=student).order_by('semester')
-    paginator = Paginator(students, 10)
+            if form.cleaned_data["ordering"]:
+                listStudents = listStudents.order_by(form.cleaned_data["ordering"])
+                sort = form.cleaned_data["ordering"]
+            for student in listStudents:
+                student.group = Group.objects.filter(students=student).order_by('semester')
+    paginator = Paginator(listStudents, 10)
     page = request.GET.get('page')
-    stusentsPaginator = paginator.get_page(page)
+    studentsPaginator = paginator.get_page(page)
     return render(request, 'report/students.html',
-                  {'students': stusentsPaginator, 'studentsSize': students.count(), 'form': form, 'ordering': sort,
+                  {'students': studentsPaginator, 'studentsSize': len(listStudents), 'form': form, 'ordering': sort,
                    'search': search, 'iexact': iexact}, )
 
+
+def getColor(rating):
+    if rating == 'Дк' or rating == 'Дисциплина' or rating == 'Подготовка':
+        return 'bg-light text-dark'
+    if rating == 'Нзч' or rating == 'НА' or rating == 'Я' or rating == 'Напр' or rating == 'Неуд':
+        return 'bg-danger text-light'
+    if rating == 'Удов':
+        return 'bg-warning text-dark'
+    if rating == 'Отл' or rating == 'Зчт':
+        return 'bg-success text-light'
+    if rating == 'Хор':
+        return 'bg-info text-dark'
+    return 'bg-secondary text-light'
+
+
+def formatResult(student, subject):
+    name = subject.subject.name
+    progress = Progress.objects.filter(student__pk=student, subject=subject)
+    point = '' if not progress.exists() else progress[0].point
+    session = Session.objects.filter(student=student, subject=subject)
+    subDep = subject.subject.subdepartament.code
+    rating = list(
+        map(lambda x: {'point': x.rating, 'color': getColor(x.rating), 'type_rating': x.get_type_rating_display()},
+            session))
+    return {'name': name, 'point': point, 'rating': rating, 'subDep': subDep}
+
+
 @login_required
-def student(request, id):
+def getStudent(request, id):
     student = Student.objects.get(pk=id)
-    return render(request, 'report/student.html',
-                  {'student': student, 'groups': Group.objects.filter(students=student).order_by('semester')})
+    groups = list(map(lambda x: {'pk': x.pk, 'name': x.name, 'semester': x.semester.name,
+                                 'results': list(
+                                     map(lambda y: formatResult(id, y), GroupSubject.objects.filter(group=x)))},
+                      Group.objects.filter(students=student).order_by('semester')))
+    return render(request, 'report/student.html', {'student': student, 'groups': groups})
+
 
 @login_required
 def group(request):

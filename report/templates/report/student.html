@@ -8,9 +8,10 @@
         {% for group in groups %}
             <div class="card mb-2">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item" style="display: flex; align-items: flex-start;justify-content: space-between">
+                    <li class="list-group-item"
+                        style="display: flex; align-items: flex-start;justify-content: space-between">
                         <h6>{{ group.name }}</h6>
-                        <small class="text-muted">{{ group.semester.name }}</small>
+                        <small class="text-muted">{{ group.semester }}</small>
                         <div>
                             <a data-toggle="collapse" href="#collapse{{ group.pk }}" role="button"
                                aria-expanded="false" aria-controls="collapseExample">
@@ -21,7 +22,25 @@
                         </div>
                     </li>
                     <li class="list-group-item collapse" id="collapse{{ group.pk }}">
-                        Список предметов с баллами и оценкой
+                        <ul class="list-group list-group-flush">
+                            {% for subject in group.results %}
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div>
+                                        {{ subject.name }} <small class="text-muted">({{ subject.subDep }})</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-light text-dark">{{ subject.point | default:"НД" }}</span>
+                                        {% for rating in subject.rating %}
+                                            <span class="badge {{ rating.color }}" title="{{ rating.type_rating }}"
+                                                  data-bs-toggle="tooltip" data-bs-placement="bottom" style="cursor: pointer">
+                                                {{ rating.point | default:"НД" }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
                     </li>
                 </ul>
             </div>
