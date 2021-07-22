@@ -19,6 +19,7 @@ class Semester(models.Model):
 class Departament(models.Model):
     code = models.CharField('Код факультета', max_length=5, unique=True)
     name = models.CharField('Название факультета', max_length=200, unique=True)
+    isService = models.BooleanField('Служебный департамент', default=False)
 
     def __str__(self):
         return self.code
@@ -34,6 +35,7 @@ class Subdepartament(models.Model):
     name = models.CharField('Название кафедры', max_length=200)
     departament = models.ForeignKey(Departament, on_delete=models.CASCADE, verbose_name='Факультет')
     prove = models.BooleanField(default=False)
+    isService = models.BooleanField('Служебная кафедра', default=False)
 
     def __str__(self):
         return self.code

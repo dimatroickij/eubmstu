@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 
 # Create your views here.
-from control.models import Progress, Group, Session, GroupSubject, Student
+from control.models import Progress, Group, Session, GroupSubject, Student, Semester, Departament
 from report.forms import StudentsFilterForm
 
 
@@ -87,3 +87,9 @@ def student(request, id):
     student = Student.objects.get(pk=id)
     return render(request, 'report/student.html',
                   {'student': student, 'groups': Group.objects.filter(students=student).order_by('semester')})
+
+@login_required
+def group(request):
+    semesters = Semester.objects.all().order_by('code')
+    departaments = Departament.objects.all().order_by('code')
+    return render(request, 'report/group.html', {'semesters': semesters, 'departaments': departaments})

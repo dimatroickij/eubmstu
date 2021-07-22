@@ -1,0 +1,25 @@
+{% extends 'application.html' %}
+{% block title %}Группы{% endblock %}
+{% block contentSite %}
+    <script>
+        {#$('#semesters').on('change', function () {#}
+        {#    $.get('/api/departament')#}
+        {#});#}
+    </script>
+    <div class="container">
+        <select id="semesters" class="form-select" aria-label="Default select example">
+            {% for semester in semesters %}
+                <option value="{{ semester.pk }}">{{ semester.name }}</option>
+            {% endfor %}
+        </select>
+        <select id="departaments" class="form-select" aria-label="Default select example">
+            {% for departament in departaments %}
+                <option value="{{ departament.pk }}">{{ departament.code }}</option>
+            {% endfor %}
+        </select>
+        <select id="subdepartaments" class="form-select" aria-label="Default select example">
+        </select>
+        <select id="groups" class="form-select" aria-label="Default select example">
+        </select>
+    </div>
+{% endblock %}
