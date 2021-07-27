@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 
 from control.models import Semester
 from eubmstu.exceptions import EmptyListSubDeps, EmptyListDeps, EmptyListGroups, DepsNotFound, SubDepsNotFound
-from eubmstu.settings import BASE_DIR
+from eubmstu.settings import BASE_DIR, USERNAME, PASSWORD
 
 
 class GetDataEU:
@@ -38,9 +38,9 @@ class GetDataEU:
     # Авторизация на сайте
     def login(self):
         try:
-            self.driver.get("https://USERNAME:PASSWORD@proxy.bmstu.ru:8443/cas/login?service=https%3A%2F%2"
-                            "Fproxy.bmstu.ru%3A8443%2Fcas%2Foauth2.0%2FcallbackAuthorize%3Fclient_name%3DCasOAuthCli"
-                            "ent%26client_id%3DEU")
+            self.driver.get("https://" + USERNAME + ':' + PASSWORD + "@proxy.bmstu.ru:8443/cas/login?service=" +
+                            "https%3A%2F%2Fproxy.bmstu.ru%3A8443%2Fcas%2Foauth2.0%2FcallbackAuthorize%3Fclient_name" +
+                            "%3DCasOAuthClient%26client_id%3DEU")
             self.driver.find_element_by_id("username").clear()
             self.driver.find_element_by_id("username").send_keys(self.username)
             self.driver.find_element_by_id("password").clear()
