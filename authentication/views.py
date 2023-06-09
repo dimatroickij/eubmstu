@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 
 from authentication.forms import MyUserCreationForm, MyUserChangeForm, LoginForm, MyPasswordResetForm
@@ -57,7 +57,7 @@ def change(request):
 
 def activate(request, uidb64, token):
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
         print(User is None)
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):

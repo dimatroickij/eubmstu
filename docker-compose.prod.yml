@@ -1,0 +1,63 @@
+version: "3.3"
+services:
+  web:
+    image: "${IMAGE}:eubmstu"
+    container_name: eubmstu
+    command: sh -c "cd nginx && sh entrypoint.sh && cd ..; python manage.py makemigrations --noinput; python manage.py migrate; python manage.py collectstatic --no-input --clear; gunicorn eubmstu.wsgi:application --bind 0.0.0.0:8000"
+    restart: always
+    volumes:
+      - static_volume:/static
+      - media_volume:/usr/src/app/mediafiles
+      - nginx-proxy_vhost:/vhost
+    expose:
+      - 8000
+    env_file:
+      - .env
+
+  rabbit:
+    image: library/rabbitmq:3.8-alpine
+    container_name: eubmstu-rabbit
+    hostname: eubmstu
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - 15672
+      - 5672
+
+  celery:
+    image: "${IMAGE}:eubmstu"
+    container_name: eubmstu-celery
+    restart: always
+    env_file:
+      - .env
+    command: celery -A eubmstu worker --loglevel=INFO
+    depends_on:
+      - rabbit
+      - web
+    links:
+      - rabbit
+
+  celery_beat:
+    image: "${IMAGE}:eubmstu"
+    container_name: eubmstu-celery_beat
+    restart: always
+    env_file:
+      - .env
+    command: celery -A eubmstu beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - rabbit
+      - web
+    links:
+      - rabbit
+
+volumes:
+  static_volume:
+  media_volume:
+  nginx-proxy_vhost:
+    external: true
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

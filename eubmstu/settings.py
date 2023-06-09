@@ -12,30 +12,22 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import platform
-from configparser import RawConfigParser
-
-config = RawConfigParser()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-if platform.system() == 'Linux':
-    config.read('/'.join(BASE_DIR.split('/')[0:-1]) + '/settings.ini')
-elif platform.system() == 'Windows':
-    config.read('\\'.join(BASE_DIR.split('\\')[0:-1]) + '\\settings.ini')
-
-USERNAME = config.get('eubmstu', 'username')
-PASSWORD = config.get('eubmstu', 'password')
+USERNAME = os.environ.get("USERNAME")
+PASSWORD = os.environ.get("PASSWORD")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.get('eubmstu', 'SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG")
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 # Application definition
 
@@ -92,15 +84,12 @@ WSGI_APPLICATION = 'eubmstu.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'eubmstu',
-        'USER': config.get('databases', 'USER'),
-        'PASSWORD': config.get('databases', 'PASSWORD'),
-        'HOST': config.get('databases', 'HOST'),
-        'PORT': 'POST',
-        'TEST': {
-            'NAME': 'eubmstu_test',
-        }
+        'ENGINE': os.environ.get("SQL_ENGINE"),
+        'NAME': os.environ.get("SQL_DATABASE"),
+        'USER': os.environ.get("SQL_USER"),
+        'PASSWORD': os.environ.get("SQL_PASSWORD"),
+        'HOST': os.environ.get("SQL_HOST"),
+        'PORT': os.environ.get("SQL_PORT"),
     }
 }
 
@@ -151,21 +140,20 @@ STATICFILES_DIRS = [
 ]
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-RECAPTCHA_PRIVATE_KEY = config.get('eubmstu', 'RECAPTCHA_PRIVATE_KEY')
-RECAPTCHA_PUBLIC_KEY = config.get('eubmstu', 'RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = config.get('email', 'EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config.get('email', 'EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-CELERY_BROKER_URL = 'amqp://%s:%s@localhost:5672/eubmstu' % (
-    config.get('celery', 'USER'), config.get('celery', 'PASSWORD'))
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+CELERY_TIMEZONE = os.environ.get("CELERY_TIMEZONE")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_TIMEZONE = 'Europe/Moscow'
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
