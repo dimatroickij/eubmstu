@@ -16,54 +16,23 @@ services:
     env_file:
       - .env
 
-#  nginx:
-#    build:
-#      context: ./nginx
-#      cache_from:
-#        - "${NGINX_IMAGE}"
-#    image: "${NGINX_IMAGE}"
-#    container_name: eubmstu-nginx
-#    volumes:
-#      - static_volume:/static
-#      - media_volume:/usr/src/app/mediafiles
-#    ports:
-#      - 80:80
+#  celery:
+#    image: "${WEB_IMAGE}"
+#    container_name: eubmstu-celery
+#    env_file:
+#      - .env
+#    command: celery -A eubmstu worker
 #    depends_on:
 #      - web
 
-  rabbit:
-    image: library/rabbitmq:3.8-alpine
-    container_name: eubmstu-rabbit
-    hostname: eubmstu
-    env_file:
-      - .env
-    expose:
-    - 15672
-    - 5672
-
-  celery:
-    image: "${WEB_IMAGE}"
-    container_name: eubmstu-celery
-    env_file:
-      - .env
-    command: celery -A eubmstu worker
-    depends_on:
-      - rabbit
-      - web
-    links:
-      - rabbit
-
-  celery_beat:
-    image: "${WEB_IMAGE}"
-    container_name: eubmstu-celery_beat
-    env_file:
-      - .env
-    command: celery -A eubmstu beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    depends_on:
-      - rabbit
-      - web
-    links:
-      - rabbit
+#  celery_beat:
+#    image: "${WEB_IMAGE}"
+#    container_name: eubmstu-celery_beat
+#    env_file:
+#      - .env
+#    command: celery -A eubmstu beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+#    depends_on:
+#      - web
 
 volumes:
   static_volume:

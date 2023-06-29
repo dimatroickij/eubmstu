@@ -1,6 +1,6 @@
 image:
   name: docker/compose:latest
-  entrypoint: [""]
+  entrypoint: [ "" ]
 
 services:
   - docker:dind
@@ -16,7 +16,6 @@ variables:
 before_script:
   - export IMAGE=$CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
   - export WEB_IMAGE=$IMAGE:eubmstu
-#  - export NGINX_IMAGE=$IMAGE:eubmstu-nginx
   - apk add --no-cache openssh-client bash
   - chmod +x ./setup_env.sh
   - bash ./setup_env.sh
@@ -26,11 +25,8 @@ build:
   stage: build
   script:
     - docker pull $IMAGE:eubmstu || true
-#    - docker pull $IMAGE:eubmstu-nginx || true
-    - docker pull library/rabbitmq:3.8-alpine
     - docker-compose -f docker-compose.ci.yml build
     - docker push $IMAGE:eubmstu
-#    - docker push $IMAGE:eubmstu-nginx
 
 deploy:
   stage: deploy
