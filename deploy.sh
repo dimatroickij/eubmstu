@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ssh -o StrictHostKeyChecking=no server@$IP_ADDRESS << 'ENDSSH'
+ssh -o -p 2222 StrictHostKeyChecking=no server@$IP_ADDRESS << 'ENDSSH'
   cd /home/server/eubmstu
   docker compose -f docker-compose.prod.yml stop
   export $(cat .env | xargs)

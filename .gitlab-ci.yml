@@ -39,7 +39,7 @@ deploy:
     - ssh-add ~/.ssh/id_rsa
     - ssh-keyscan -H 'gitlab.com' >> ~/.ssh/known_hosts
     - chmod +x ./deploy.sh
-    - scp  -o StrictHostKeyChecking=no -r ./.env ./docker-compose.prod.yml server@$IP_ADDRESS:/home/server/eubmstu
+    - scp -P 2222 -o StrictHostKeyChecking=no -r ./.env ./docker-compose.prod.yml server@$IP_ADDRESS:/home/server/eubmstu
     - bash ./deploy.sh
   only:
     - master

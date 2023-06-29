@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.6"
 services:
   web:
     image: "${IMAGE}:eubmstu"
@@ -36,6 +36,8 @@ services:
 
 volumes:
   static_volume:
+    name: eubmstu_static_volume
+    external: true
   media_volume:
   nginx-proxy_vhost:
     external: true
@@ -44,3 +46,4 @@ networks:
   default:
     external:
       name: nginx-proxy
+      external: true
