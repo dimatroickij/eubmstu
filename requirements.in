@@ -11,3 +11,4 @@ django-celery-beat
 selenium
 pyvirtualdisplay
 beautifulsoup4
+whitenoise

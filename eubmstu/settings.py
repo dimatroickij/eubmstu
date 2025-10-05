@@ -45,11 +45,13 @@ INSTALLED_APPS = [
     'control',
     'update',
     'report',
+    "whitenoise.runserver_nostatic",
     'api'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -59,6 +61,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'eubmstu.urls'
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 TEMPLATES = [
     {
