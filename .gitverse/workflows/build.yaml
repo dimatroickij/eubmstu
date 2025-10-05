@@ -1,0 +1,24 @@
+name: Сборка образа
+on:
+  workflow_dispatch:
+jobs:
+  build-test:
+    name: Сборка образа
+    runs-on: 'ubuntu-cloud-runner'
+    env:
+      DOCKER_REGISTRY: dimatroickij.cr.cloud.ru
+      DOCKER_IMAGE: dimatroickij.cr.cloud.ru/eubmstu
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Cloud.ru
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.CLOUD_KEY_ID }}
+          password: ${{ secrets.CLOUD_KEY_SECRET }}
+
+      - name: Kaniko build and push
+        run: |
+          /kaniko/executor --context=. --dockerfile=./Dockerfile --destination=${{ env.DOCKER_IMAGE }}:eubmstu
