@@ -8,19 +8,19 @@
         {% endif %}
 
         {% for line in fieldset %}
-            <li class="list-group-item form-row{% if line.fields|length_is:'1' and line.errors %} errors{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
-                {% if line.fields|length_is:'1' %}
+            <li class="list-group-item form-row{% if line.fields|length == 1 and line.errors %} errors{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
+                {% if line.fields|length == 1 %}
                     <small class="text-danger mt-2 mb-2">{{ line.errors }}</small>
                 {% endif %}
                 {% for field in line %}
-                    <div class="form-group row {% if not line.fields|length_is:'1' %}
+                    <div class="form-group row {% if not line.fields|length == 1 %}
                          fieldBox{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}{% if field.field.is_hidden %} hidden{% endif %}{% elif field.is_checkbox %}
                          checkbox-row{% endif %}">
-                        {% if not line.fields|length_is:'1' and not field.is_readonly %}
+                        {% if not line.fields|length == 1 and not field.is_readonly %}
                             {{ field.errors }}{% endif %}
                         {% if field.is_checkbox %}
                             <div class="form-check">
-                                {% if line.fields|length_is:'1' %}{{ line.errors }}{% endif %}
+                                {% if line.fields|length == 1 %}{{ line.errors }}{% endif %}
                                 {{ field.field }} <label for="{{ field.field.id_for_label }}"
                                                          class="form-check-label">{{ field.field.label }}</label>
                                 {% if field.field.help_text %}
