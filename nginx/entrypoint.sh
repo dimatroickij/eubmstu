@@ -1,6 +1,6 @@
 #!/bin/bash
 
-array=$(echo $VIRTUAL_HOST | tr "," "\n")
+array=$(echo $DJANGO_ALLOWED_HOSTS | tr " " "\n")
 
 for element in $array
 do

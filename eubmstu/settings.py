@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
-CSRF_TRUSTED_ORIGINS = list(map(lambda x: 'https://' + x, os.environ.get("VIRTUAL_HOST").split(",")))
+CSRF_TRUSTED_ORIGINS = list(map(lambda x: 'https://' + x, ALLOWED_HOSTS))
 
 # Application definition
 
